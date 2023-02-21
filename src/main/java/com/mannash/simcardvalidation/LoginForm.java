@@ -24,7 +24,7 @@ public class LoginForm extends Application {
         stage.setScene(splashScene);
 
         stage.show();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(4), event -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(14), event -> {
             stage.setScene(splashScene);
             stage.close();
             Stage loginStage = new Stage();
@@ -35,9 +35,6 @@ public class LoginForm extends Application {
             loginStage.setResizable(false);
             loginStage.setTitle("SIM Verify!");
             loginStage.show();
-
-
-
         }));
         timeline.play();
 

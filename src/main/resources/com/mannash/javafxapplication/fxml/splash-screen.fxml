@@ -7,7 +7,7 @@
    <children>
       <ImageView fitHeight="421.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@images/r3.gif" />
+            <Image url="@images/r4.gif" />
          </image>
       </ImageView>
    </children>
