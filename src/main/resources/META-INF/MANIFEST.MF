@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: com.mannash.simcardvalidation.LoginForm
+Class-Path: httpclient-4.5.4.jar httpcore-4.4.6.jar slf4j-api-1.7.25.jar slf4j.jar
 

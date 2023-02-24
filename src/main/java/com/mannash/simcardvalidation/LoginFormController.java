@@ -1,15 +1,16 @@
 package com.mannash.simcardvalidation;
 
 import com.mannash.simcardvalidation.pojo.ResponseAuthenticationPojo;
-import com.mannash.simcardvalidation.service.SimVerifyServerCommunicationService;
-import com.mannash.simcardvalidation.service.SimVerifyServerCommunicationServiceImpl;
+import com.mannash.simcardvalidation.service.TrakmeServerCommunicationService;
+import com.mannash.simcardvalidation.service.TrakmeServerCommunicationServiceImpl;
+//import com.mannash.simcardvalidation.zzzservice2.SimVerifyServerCommunicationService;
+//import com.mannash.simcardvalidation.zzzservice2.SimVerifyServerCommunicationServiceImpl;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -32,11 +33,14 @@ public class LoginFormController {
     @FXML
     private void onLoginPress() throws IOException {
 
-        SimVerifyServerCommunicationService simVerifyServerCommunicationService = new SimVerifyServerCommunicationServiceImpl();
 
+
+
+
+        TrakmeServerCommunicationService trakmeServerCommunicationService = new TrakmeServerCommunicationServiceImpl();
         String userId = user_input.getText();
         String password = password_input.getText();
-        ResponseAuthenticationPojo responseAuthenticationPojo=simVerifyServerCommunicationService.authenticateClient(userId,password);
+        ResponseAuthenticationPojo responseAuthenticationPojo = trakmeServerCommunicationService.authenticateClient(userId,password);
 //        testTextField.setText("response code : "+responseAuthenticationPojo.getStatusCode()+"\n");
 //        testTextField.setText("response message : "+responseAuthenticationPojo.getMessage());
         responseAuthenticationPojo.setUserName(userId);
@@ -44,7 +48,7 @@ public class LoginFormController {
         if (responseAuthenticationPojo.getStatusCode() != 200) {
 
 
-        } else {
+        } else if(responseAuthenticationPojo.getStatusCode()==200){
 
             Parent mainPage = FXMLLoader.load(getClass().getResource("/com/mannash/javafxapplication/fxml/Testing-view.fxml"));
 //        Scene primaryScene = loginButton.getScene();
