@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="loginFormAnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mannash.simcardvalidation.LoginFormController">
+    <children>
+        <Pane layoutX="287.0" layoutY="23.0" prefHeight="353.0" prefWidth="290.0" style="-fx-background-color: #FF9999;" AnchorPane.bottomAnchor="23.0" AnchorPane.leftAnchor="287.0" AnchorPane.rightAnchor="23.0" AnchorPane.topAnchor="23.0">
+            <children>
+                <TextField id="user_input" layoutX="52.0" layoutY="101.0" prefHeight="25.0" prefWidth="182.0" promptText="user@example.com" />
+                <Label layoutX="52.0" layoutY="68.0" text="E-mail">
+                    <font>
+                        <Font name="Roboto Light" size="12.0" />
+                    </font>
+                </Label>
+                <Label layoutX="52.0" layoutY="147.0" text="Password">
+                    <font>
+                        <Font name="Roboto Light" size="12.0" />
+                    </font>
+                </Label>
+                <Button fx:id="loginButton" layoutX="54.0" layoutY="235.0" lineSpacing="3.0" mnemonicParsing="false" onAction="#onLoginPress" prefHeight="25.0" prefWidth="182.0" style="-fx-background-color: #FF0000;" text="Log In" textAlignment="JUSTIFY" textFill="#fbf8f8">
+                    <font>
+                        <Font name="Roboto Light" size="12.0" />
+                    </font>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                    <effect>
+                        <InnerShadow />
+                    </effect>
+                </Button>
+                <Label alignment="CENTER" layoutX="108.0" layoutY="24.0" style="-fx-font-style: bold;" text="Sign In">
+                    <font>
+                        <Font name="Arial Bold" size="16.0" />
+                    </font>
+                </Label>
+                <Hyperlink layoutX="86.0" layoutY="289.0" text="Forgot password" textFill="#d40909" />
+                <PasswordField id="password_input" layoutX="52.0" layoutY="177.0" prefHeight="25.0" prefWidth="182.0" promptText="password" />
+            </children>
+            <effect>
+                <InnerShadow choke="0.01" height="23.36" radius="5.34" width="0.0" />
+            </effect></Pane>
+        <ImageView fitHeight="132.0" fitWidth="210.0" layoutX="34.0" layoutY="93.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@images/airtel_logo.png" />
+            </image>
+            <effect>
+                <Reflection />
+            </effect></ImageView>
+
+    </children>
+    <effect>
+        <DropShadow />
+    </effect>
+</AnchorPane>

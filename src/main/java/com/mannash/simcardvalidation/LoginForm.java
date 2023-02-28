@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -22,6 +23,7 @@ public class LoginForm extends Application {
         Scene loginScene = new Scene(loginRoot);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(splashScene);
+
 
         stage.show();
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(14), event -> {
