@@ -130,7 +130,7 @@
                         <Image url="@images/greycircle.png" />
                     </image>
                 </ImageView>
-                <ImageView id="img_test_button" fx:id="img_test_button" fitHeight="65.0" fitWidth="144.0" layoutX="200.0" layoutY="209.0" onMouseClicked="#changeImage" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;" AnchorPane.bottomAnchor="29.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="356.0" AnchorPane.topAnchor="209.0">
+                <ImageView id="img_test_button" fx:id="img_test_button" fitHeight="65.0" fitWidth="144.0" layoutX="200.0" layoutY="209.0" onMouseClicked="#onStartButtonPress" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;" AnchorPane.bottomAnchor="29.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="356.0" AnchorPane.topAnchor="209.0">
                     <image>
                         <Image url="@images/startTest.gif" />
                     </image></ImageView>

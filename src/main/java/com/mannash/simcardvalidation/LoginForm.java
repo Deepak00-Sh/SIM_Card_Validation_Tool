@@ -24,7 +24,7 @@ public class LoginForm extends Application {
         stage.setScene(splashScene);
 
         stage.show();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(14), event -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), event -> {
             stage.setScene(splashScene);
             stage.close();
             Stage loginStage = new Stage();
