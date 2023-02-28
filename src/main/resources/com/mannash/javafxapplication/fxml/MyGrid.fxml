@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="712.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mannash.simcardvalidation.MyGrid">
+   <top>
+      <AnchorPane maxHeight="-Infinity" prefHeight="67.0" prefWidth="709.0" style="-fx-background-color: #E1D7C6; -fx-border-style: solid; -fx-border-width: 0 0 0 0; -fx-border-color: black;" BorderPane.alignment="CENTER">
+         <children>
+            <HBox layoutY="-1.0" maxHeight="-Infinity" prefHeight="55.0" prefWidth="84.0">
+               <children>
+                  <ImageView fitHeight="55.0" fitWidth="90.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                     <image>
+                        <Image url="@images/airtelair2.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="14.0" top="5.0" />
+                     </HBox.margin>
+                  </ImageView>
+               </children>
+            </HBox>
+         </children>
+      </AnchorPane>
+   </top>
+
+   <center>
+      <GridPane id="mainGridPane" fx:id="mainGridPane" prefHeight="396.0" prefWidth="493.0">
+         <columnConstraints>
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+         </rowConstraints></GridPane>
+
+   </center>
+   <left>
+      <VBox prefHeight="424.0" prefWidth="199.0" style="-fx-background-color: #2B3467; -fx-border-style: solid; -fx-border-width: 0 0 0 0; -fx-border-color: black;" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="32.0" prefWidth="194.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="32.0" prefWidth="204.0" style="-fx-background-color: #E1D7C6; ">
+                     <children>
+                        <Label alignment="BOTTOM_LEFT" maxWidth="-Infinity" prefHeight="17.0" prefWidth="128.0" text="CONNECTED CARDS" HBox.hgrow="ALWAYS">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <effect>
+                        <DropShadow>
+                           <color>
+                              <Color red="0.5614035129547119" green="0.5406107902526855" blue="0.5406107902526855" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </HBox>
+               </children></HBox>
+            <ListView id="cardsConnectedList" fx:id="cardsConnectedList" prefHeight="142.0" prefWidth="199.0" style="-fx-background-color: inherit;">
+
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="8991000904448610811F" />
+                     <String fx:value="8991000904448610811F" />
+                     <String fx:value="8991000904448610811F" />
+                     <String fx:value="8991000904448610811F" />
+                  </FXCollections>
+               </items>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ListView>
+         </children>
+      </VBox>
+
+   </left>
+   <bottom>
+      <AnchorPane prefHeight="24.0" prefWidth="700.0" BorderPane.alignment="CENTER" />
+   </bottom>
+
+</BorderPane>

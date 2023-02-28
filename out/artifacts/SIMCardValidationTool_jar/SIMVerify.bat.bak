@@ -1,0 +1,1 @@
+javaw --module-path "D:\work\Project_3\R&D\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.web -jar SIMCardValidationTool.jar

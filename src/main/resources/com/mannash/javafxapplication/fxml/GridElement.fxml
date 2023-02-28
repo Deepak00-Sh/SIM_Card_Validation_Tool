@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane id="" fx:id="parentStackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="135.0" prefWidth="277.0" style="-fx-background-radius: 15; -fx-background-color: #2F58CD;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="144.0" prefWidth="277.0">
+         <children>
+            <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="26.0" prefWidth="279.0">
+               <children>
+                  <Label id="iccid_label" maxHeight="-Infinity" maxWidth="-Infinity" text="ICCID : ">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets top="7.0" />
+                     </HBox.margin></Label>
+                  <Label id="iccid_value_label" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="17.0" prefWidth="146.0" text="12345678901234567890" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="4.0" top="7.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="27.0" prefWidth="277.0">
+               <children>
+                  <Label id="iccid_label" maxHeight="-Infinity" maxWidth="-Infinity" text="IMSI   : ">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets top="7.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Label id="iccid_value_label" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="17.0" prefWidth="146.0" text="12345678901234" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="4.0" top="7.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox prefHeight="84.0" prefWidth="277.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="83.0" prefWidth="140.0">
+                     <children>
+                        <Label maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="20.0" prefWidth="140.0" text="STATUS ">
+                           <padding>
+                              <Insets left="5.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="83.0" prefWidth="137.0">
+                     <children>
+                        <ImageView fitHeight="46.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/question-mark.png" />
+                           </image></ImageView>
+                     </children>
+                  </VBox>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</StackPane>
