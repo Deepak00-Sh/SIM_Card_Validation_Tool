@@ -24,12 +24,12 @@ public class LoginForm extends Application {
         stage.setScene(splashScene);
 
         stage.show();
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), event -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(14), event -> {
             stage.setScene(splashScene);
             stage.close();
             Stage loginStage = new Stage();
 
-            Image icon = new Image("/com/mannash/javafxapplication/fxml/images/airtel_logo.png");
+            Image icon = new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png");
             loginStage.getIcons().add(icon);
             loginStage.setScene(loginScene);
             loginStage.setResizable(false);

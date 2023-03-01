@@ -16,7 +16,7 @@
                         <Image url="@images/airtelStore2.jpg" />
                     </image>
                 </ImageView>
-                <TextField fx:id="user_input" id="user_input" layoutX="50.0" layoutY="228.0" prefHeight="25.0" prefWidth="182.0" promptText="user@example.com" />
+                <TextField id="user_input" fx:id="user_input" layoutX="50.0" layoutY="228.0" prefHeight="25.0" prefWidth="182.0" promptText="user@example.com" />
                 <Button fx:id="loginButton" layoutX="50.0" layoutY="300.0" lineSpacing="3.0" mnemonicParsing="false" onAction="#onLoginPress" prefHeight="25.0" prefWidth="182.0" style="-fx-background-color: #FF0000;" text="Log In" textAlignment="JUSTIFY" textFill="#fbf8f8">
                     <font>
                         <Font name="Roboto Light" size="12.0" />
@@ -28,8 +28,9 @@
                         <InnerShadow />
                     </effect>
                 </Button>
-                <PasswordField fx:id="password_input" id="password_input" layoutX="50.0" layoutY="260.0" prefHeight="25.0" prefWidth="182.0" promptText="password" />
+                <PasswordField id="password_input" fx:id="password_input" layoutX="50.0" layoutY="260.0" prefHeight="25.0" prefWidth="182.0" promptText="password" />
                 <Hyperlink layoutX="93.0" layoutY="325.0" text="Forgot password" textFill="#d40909" />
+            <Label id="promptLabel" fx:id="promptLabel" layoutX="51.0" layoutY="201.0" prefHeight="17.0" prefWidth="182.0" />
             </children>
             <effect>
                 <InnerShadow choke="0.01" height="23.36" radius="5.34" width="0.0" />

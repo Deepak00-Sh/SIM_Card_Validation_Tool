@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scanPeriod="30 seconds" scan="true">
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    <fileNamePattern>N:/FieldTesting Logs/trakmeclient1a%d{yyyyMMdd}.log.gz</fileNamePattern>
+    /// <fileNamePattern>C:/logs/FieldTesting Logs/trakmeclient1a%d{yyyyMMdd}.log.gz</fileNamePattern>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} [%-15.15thread] %-7level %-20.-20logger{0} %message%n</pattern>
+    </encoder>
+  </appender>
+  <logger level="DEBUG" name="com.mannash"/>
+  <root level="WARN">
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>
