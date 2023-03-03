@@ -47,10 +47,12 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 		TerminalFactory terminalFactory = null;
 		try {
 			terminalFactory = TerminalFactory.getInstance("PC/SC", null);
+
 			// this.logger.debug("Terminal factory : " + terminalFactory);
 		} catch (NoSuchAlgorithmException e1) {
 			e1.printStackTrace();
 		}
+
 		List<CardTerminal> list = null;
 		try {
 			list = terminalFactory.terminals().list();
@@ -131,6 +133,7 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 
 			}
 		} catch (Throwable e) {
+			e.printStackTrace();
 			controller.displayLogs(_terminal,"No device found");
 			// this.logger.info("Terminal is not connected.");
 		}

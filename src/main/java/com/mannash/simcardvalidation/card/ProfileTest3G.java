@@ -72,7 +72,7 @@ public class ProfileTest3G {
 	}
 
 	public boolean runProfileTesting() {
-		controller.displayLogs(_terminal,"File System Verification started");
+		controller.displayLogs(_terminal,"Profile Verification started");
 		if (this.aDM.equals("0000000000000000")) {
 			this.aID = getAID();
 			if (this.aID == null) {
@@ -354,10 +354,11 @@ public class ProfileTest3G {
 			String str2 = paramArrayOfString[1];
 			gotoFile(paramArrayOfString[1]);
 			controller.displayLogs(_terminal,_card,"00A4000402" + str1);
-//			controller.displayLogs(_card,_terminal,);
 			if (!sendRawApduNoPrint("00A4000402" + str1)) {
+				controller.displayLogs(_card,_terminal,getSW1Text()+getSW2Text());
 				return false;
 			}
+			controller.displayLogs(_card,_terminal,getSW1Text()+getSW2Text());
 			if (getSW1Text().equals("90")) {
 				String str3 = insertSpace(getResponse());
 				StringTokenizer stringTokenizer = new StringTokenizer(str3, " ");
@@ -518,6 +519,7 @@ public class ProfileTest3G {
 						this.woId, LogType.DEBUG);
 				this.logger.debug("File not found !!" + str1 + " at path " + paramArrayOfString[1], this.ICCID,
 						this.woId);
+				return false;
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace();
@@ -729,7 +731,7 @@ public class ProfileTest3G {
 							this._SW = "";
 							this._RspDataBytes = null;
 							this._Error = "Command: " + paramString + "\nERROR: " + exception.getMessage() + "\n";
-							controller.displayLogs(_card,_terminal,paramString +" "+exception.getMessage());
+//							controller.displayLogs(_card,_terminal,paramString +" "+exception.getMessage());
 						}
 						try {
 
@@ -770,7 +772,7 @@ public class ProfileTest3G {
 							this._SW1 = (byte) responseAPDU.getSW1();
 							this._SW2 = (byte) responseAPDU.getSW2();
 							System.out.println("APDU : "+ paramString+"Response :"+this._SW);
-							controller.displayLogs(_card,_terminal, this._SW);
+//							controller.displayLogs(_card,_terminal, this._SW);
 						} catch (Exception exception) {
 							exception.printStackTrace();
 							this._CommandApduBytes = null;
@@ -781,7 +783,7 @@ public class ProfileTest3G {
 							this._SW = "";
 							this._RspDataBytes = null;
 							this._Error = "Command: " + paramString + "\nERROR: Invalid APDU. Re-check it..\n";
-							controller.displayLogs(_card,_terminal,paramString + " Invalid APDU");
+//							controller.displayLogs(_card,_terminal,paramString + " Invalid APDU");
 						}
 					}
 				}
@@ -904,13 +906,9 @@ public class ProfileTest3G {
 					for (byte b1 = 0; b1 < j; b1++)
 						arrayOfString[b1] = stringTokenizer.nextToken();
 				if (this.admFlag == 1) {
-					if (!compareFileContent(arrayOfString)) {
-						return false;
-					}
+
 				} else if (!arrayOfString[3].equals("ADM")) {
-					if (!compareFileContent(arrayOfString)) {
-						return false;
-					}
+
 				} else {
 					this.logger.debug("\n Can not read file " + arrayOfString[0] + " at path " + arrayOfString[1]
 							+ " ADM required");
@@ -942,283 +940,6 @@ public class ProfileTest3G {
 		System.out.println(updatedContent + getSW1Text() + getSW2Text());
 	}
 
-	public boolean compareFileContent(String[] paramArrayOfString) {
-		try {
-			String str = paramArrayOfString[0];
-			gotoFile(paramArrayOfString[1]);
-			if (!sendRawApduNoPrint("00A4000402" + str)) {
-				controller.displayLogs(_terminal,_card,"00A4000402" + str);
-				return false;
-			}
-			if (getSW1Text().equals("90")) {
-				String str1 = insertSpace(getResponse());
-				StringTokenizer stringTokenizer = new StringTokenizer(str1, " ");
-				int i = stringTokenizer.countTokens();
-				byte b1 = 0, b2 = 0, b3 = 0, b4 = 0;
-				String str2 = "", str3 = "";
-				String[] arrayOfString = new String[i];
-				if (stringTokenizer.hasMoreTokens())
-					for (byte b = 0; b < i; b++) {
-						arrayOfString[b] = stringTokenizer.nextToken();
-						if (arrayOfString[b].equals("82")) {
-							if (b1 == 0)
-								b1 = b;
-						}
-						if (arrayOfString[b].equals("83")) {
-							if (b3 == 0)
-								b3 = b;
-						}
-						if (arrayOfString[b].equals("80")) {
-							if (b + 1 != i)
-								b2 = b;
-						}
-						if (arrayOfString[b].equals("8B")) {
-							if (b4 == 0)
-								b4 = b;
-						}
-
-					}
-
-				@SuppressWarnings("unused")
-				String str4 = "", str5 = "", str6 = "", str7 = "", str8 = "", str9 = "", str10 = "", str11 = "";
-				String str12 = arrayOfString[b1 + 2];
-//				String str13 = arrayOfString[b3 + 2] + arrayOfString[b3 + 3];
-				if (b4 != 0) {
-					str2 = arrayOfString[b4 + 2] + arrayOfString[b4 + 3];
-					str3 = arrayOfString[b4 + 4];
-				} else {
-					str2 = "2F06";
-					str3 = "01";
-				}
-				@SuppressWarnings("unused")
-				int j = Integer.parseInt(arrayOfString[b2 + 2] + arrayOfString[b2 + 3], 16), k = 0, m = 0;
-				String str14 = readAMDO(str2, str3, paramArrayOfString[1]);
-				if (str14.equals(null)) {
-					// this.logger.debug("\nAccess condition file reading failed for :" + str2);
-				} else {
-					str10 = getAccessRight(str14);
-					StringTokenizer stringTokenizer1 = new StringTokenizer(str10, ",");
-					int i3 = stringTokenizer1.countTokens();
-					String[] arrayOfString1 = new String[i3];
-					if (stringTokenizer1.hasMoreTokens())
-						for (byte b = 0; b < i3; b++) {
-							arrayOfString1[b] = stringTokenizer1.nextToken();
-							str11 = arrayOfString1[1];
-						}
-				}
-				if (!str12.equals("41")) {
-					k = Integer.parseInt(arrayOfString[b1 + 4] + arrayOfString[b1 + 5], 16);
-					m = Integer.parseInt(arrayOfString[b1 + 6], 16);
-				}
-				switch (str12) {
-				case "41":
-					str4 = "T";
-					break;
-				case "42":
-					str4 = "LF";
-					break;
-				case "43":
-					str4 = "RFU";
-					break;
-				case "44":
-					str4 = "RFU";
-					break;
-				case "45":
-					str4 = "RFU";
-					break;
-				case "46":
-					str4 = "C";
-					break;
-				}
-				String str15 = "", str16 = "", str17 = "", str18 = "", str19 = "", str20 = "";
-				boolean bool = false;
-				int n = 0, i1 = 0, i2 = 0;
-				str19 = paramArrayOfString[5];
-				if (str19.indexOf("-") >= 0) {
-					int i3 = str19.indexOf("-");
-					bool = true;
-					i1 = Integer.parseInt(str19.substring(0, i3));
-					i2 = Integer.parseInt(str19.substring(i3 + 1, str19.length()));
-				} else {
-					n = Integer.parseInt(str19);
-				}
-				if (str12.equals("41")) {
-					if (j > 255)
-						j = 255;
-					str17 = Integer.toHexString(j);
-					if (str17.length() == 1)
-						str17 = "0" + str17;
-					str16 = paramArrayOfString[6];
-					gotoFile(paramArrayOfString[1]);
-					if (!sendRawApduNoPrint("00A4000402" + str)) {
-						return false;
-					}
-					if (!sendRawApduNoPrint("00B00000" + str17)) {
-						return false;
-					}
-					if (getSW1Text().equals("90")) {
-						str15 = getResponse();
-						str20 = compareContent(str16, str15);
-						if (str20.equals("NOMATCH")) {
-							// this.logger.debug("\n Content not matched for transparent file id :" + str +
-							// " at path " + paramArrayOfString[1]);
-							// this.logger.debug("\n\tExpected: " + insertSpace(str16));
-							// this.logger.debug("\n\tReceived: " + insertSpace(str15));
-							log("Content not matched for transparent file id :" + str + " at path "
-									+ paramArrayOfString[1], "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-							controller.displayLogs(_card,_terminal,"Content not matched for transparent file id :" + str + " at path "
-									+ paramArrayOfString[1]);
-							log("Expected: " + insertSpace(str16), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-							controller.displayLogs(_card,_terminal,"Expected: " + insertSpace(str16));
-							log("Received: " + insertSpace(str15), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-							controller.displayLogs(_card,_terminal,"Received: " + insertSpace(str15));
-						} else if (str20.equals("MATCH")) {
-							// this.logger.debug("\n Content matched for transparent file id :" + str + " at
-							// path " + paramArrayOfString[1]);
-							// this.logger.debug("\n\tExpected: " + insertSpace(str16));
-							// this.logger.debug("\n\tReceived: " + insertSpace(str15));
-							log("Content matched for transparent file id :" + str + " at path " + paramArrayOfString[1],
-									"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-							controller.displayLogs(_card,_terminal,"Content matched for transparent file id :" + str + " at path " + paramArrayOfString[1]);
-							log("Expected: " + insertSpace(str16), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-							controller.displayLogs(_card,_terminal,"Expected: " + insertSpace(str16));
-							log("Received: " + insertSpace(str15), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-							controller.displayLogs(_card,_terminal,"Received: " + insertSpace(str15));
-						} else {
-							// this.logger.debug("\n\tCompare content failed for file : " + str);
-						}
-					} else {
-						// this.logger.debug("\n Could not read transparent file :" + str + " at path "
-						// + paramArrayOfString[1] + " at record number : 01");
-						this.loggerService.log("Could not read transparent file :" + str + " at path "
-								+ paramArrayOfString[1] + " at record number : 01", this.ICCID, this.woId,
-								LogType.DEBUG);
-						controller.displayLogs(_card,_terminal,"Could not read transparent file :" + str + " at path "
-								+ paramArrayOfString[1] + " at record number : 01");
-						log("\n Could not read transparent file :" + str + " at path " + paramArrayOfString[1]
-								+ " at record number : 01", "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-								log_path);
-						controller.displayLogs(_card,_terminal,"Could not read transparent file :" + str + " at path " + paramArrayOfString[1]
-								+ " at record number : 01");
-					}
-				} else if (bool == true) {
-					for (int i3 = i1; i3 <= i2; i3++) {
-						str17 = Integer.toHexString(k);
-						if (str17.length() == 1)
-							str17 = "0" + str17;
-						str18 = Integer.toHexString(i3);
-						if (str18.length() == 1)
-							str18 = "0" + str18;
-						str16 = paramArrayOfString[6];
-						gotoFile(paramArrayOfString[1]);
-						if (!sendRawApduNoPrint("00A4000402" + str)) {
-							return false;
-						}
-						if (!sendRawApduNoPrint("00B2" + str18 + "04" + str17)) {
-							return false;
-						}
-						if (getSW1Text().equals("90")) {
-							str15 = getResponse();
-							str20 = compareContent(str16, str15);
-							if (str20.equals("NOMATCH")) {
-								// this.logger.debug("\n Content not matched for file id :" + str + " at path "
-								// + paramArrayOfString[1] + " at record number :" + str18);
-								// this.logger.debug("\n\tExpected: " + insertSpace(str16));
-								// this.logger.debug("\n\tReceived: " + insertSpace(str15));
-								log("Content not matched for file id :" + str + " at path " + paramArrayOfString[1]
-										+ " at record number :" + str18,
-										"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-								log("Expected: " + insertSpace(str16),
-										"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-								log("Received: " + insertSpace(str15),
-										"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-
-							}
-						} else {
-							// this.logger.debug("\n Could not read file :" + str + " at path " +
-							// paramArrayOfString[1] + " at record number :" + str18);
-							this.loggerService.log("Could not read file :" + str + " at path " + paramArrayOfString[1]
-									+ " at record number :" + str18, this.ICCID, this.woId, LogType.DEBUG);
-							log("\n Could not read file :" + str + " at path " + paramArrayOfString[1]
-									+ " at record number :" + str18,
-									"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-						}
-					}
-				} else {
-					str17 = Integer.toHexString(k);
-					if (str17.length() == 1)
-						str17 = "0" + str17;
-					str18 = Integer.toHexString(n);
-					if (str18.length() == 1)
-						str18 = "0" + str18;
-					str16 = paramArrayOfString[6];
-					gotoFile(paramArrayOfString[1]);
-					if (!sendRawApduNoPrint("00A4000402" + str)) {
-						return false;
-					}
-					if (!sendRawApduNoPrint("00B2" + str18 + "04" + str17)) {
-						return false;
-					}
-					if (getSW1Text().equals("90")) {
-						str15 = getResponse();
-						str20 = compareContent(str16, str15);
-						if (str20.equals("NOMATCH")) {
-							// this.logger.debug("\n Content not matched for file id :" + str + " at path "
-							// + paramArrayOfString[1] + " at record number :" + str18);
-							// this.logger.debug("\n\tExpected: " + insertSpace(str16));
-							// this.logger.debug("\n\tReceived: " + insertSpace(str15));
-							log("Content not matched for file id :" + str + " at path " + paramArrayOfString[1]
-									+ " at record number :" + str18,
-									"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-							log("Expected: " + insertSpace(str16), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-							log("Received: " + insertSpace(str15), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-
-						} else if (str20.equals("MATCH")) {
-							// this.logger.debug("\n Content matched for transparent file id :" + str + " at
-							// path " + paramArrayOfString[1]);
-							// this.logger.debug("\n\tExpected: " + insertSpace(str16));
-							// this.logger.debug("\n\tReceived: " + insertSpace(str15));
-							log("Content matched for transparent file id :" + str + " at path " + paramArrayOfString[1],
-									"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-							log("Expected: " + insertSpace(str16), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-							log("Received: " + insertSpace(str15), "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-									log_path);
-						} else {
-							// this.logger.debug("\n\tCompare content failed for file : " + str);
-						}
-
-					} else {
-						// this.logger.debug("\n Could not read file :" + str + " at path " +
-						// paramArrayOfString[1] + " at record number :" + str18);
-						this.loggerService.log("Could not read file :" + str + " at path " + paramArrayOfString[1]
-								+ " at record number :" + str18, this.ICCID, this.woId, LogType.DEBUG);
-						log("\n Could not read file :" + str + " at path " + paramArrayOfString[1]
-								+ " at record number :" + str18, "PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_",
-								log_path);
-					}
-				}
-			} else {
-				// this.logger.debug("\n File not found : " + str + " at path " +
-				// paramArrayOfString[1]);
-				this.loggerService.log("File not found !!" + str + " at path " + paramArrayOfString[1], this.ICCID,
-						this.woId, LogType.DEBUG);
-				log("\n File not found " + str + " at path " + paramArrayOfString[1],
-						"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-			}
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			return false;
-		}
-		return true;
-	}
 
 	public byte[] getATRBytes() {
 		byte[] arrayOfByte = null;
@@ -1405,39 +1126,39 @@ public class ProfileTest3G {
 	}
 
 	public void log(String paramString1, String paramString2, String paramString3) {
-		try {
-
-//			File directory = new File(this.properties.getProperty("profileLogPath"));
-
-			this.loggerService.log(paramString1, this.ICCID, this.woId, LogType.DEBUG);
-			Calendar calendar = Calendar.getInstance();
-			@SuppressWarnings("unused")
-			String str1 = paramString2 + formatN("" + calendar.get(1), 4) + formatN("" + (calendar.get(2) + 1), 2)
-					+ formatN("" + calendar.get(5), 2);
-			String str2 = formatN("" + calendar.get(1), 4) + formatN("" + (calendar.get(2) + 1), 2)
-					+ formatN("" + calendar.get(5), 2);
-			String str3 = formatN("" + calendar.get(11), 2) + formatN("" + calendar.get(12), 2)
-					+ formatN("" + calendar.get(13), 2);
-			String str4 = getdate(1);
-			String str5 = str4.substring(0, 6);
-
-//			File file2 = new File(this.properties.getProperty("profileLogPath") +"/"+ paramString2 +"_" + str5  + ".txt");
-			File file2 = new File(this.localProfileLogPath + paramString2 + str2 + ".txt");
-			if (!file2.exists()) {
-				file2.createNewFile();
-			}
-
-//			FileOutputStream fileOutputStream = new FileOutputStream(paramString3 + "/" + str5 + "/" + str1 + ".txt",
-//					true);
-
-			FileOutputStream fileOutputStream = new FileOutputStream(file2, true);
-			PrintStream printStream = new PrintStream(fileOutputStream);
-			printStream.println("#" + str2 + "#" + str3 + "#" + paramString1);
-			printStream.close();
-			fileOutputStream.close();
-		} catch (Exception exception) {
-			// this.logger.debug("GOT Exception in LOG method as:" + exception);
-		}
+//		try {
+//
+////			File directory = new File(this.properties.getProperty("profileLogPath"));
+//
+//			this.loggerService.log(paramString1, this.ICCID, this.woId, LogType.DEBUG);
+//			Calendar calendar = Calendar.getInstance();
+//			@SuppressWarnings("unused")
+//			String str1 = paramString2 + formatN("" + calendar.get(1), 4) + formatN("" + (calendar.get(2) + 1), 2)
+//					+ formatN("" + calendar.get(5), 2);
+//			String str2 = formatN("" + calendar.get(1), 4) + formatN("" + (calendar.get(2) + 1), 2)
+//					+ formatN("" + calendar.get(5), 2);
+//			String str3 = formatN("" + calendar.get(11), 2) + formatN("" + calendar.get(12), 2)
+//					+ formatN("" + calendar.get(13), 2);
+//			String str4 = getdate(1);
+//			String str5 = str4.substring(0, 6);
+//
+////			File file2 = new File(this.properties.getProperty("profileLogPath") +"/"+ paramString2 +"_" + str5  + ".txt");
+//			File file2 = new File(this.localProfileLogPath + paramString2 + str2 + ".txt");
+//			if (!file2.exists()) {
+//				file2.createNewFile();
+//			}
+//
+////			FileOutputStream fileOutputStream = new FileOutputStream(paramString3 + "/" + str5 + "/" + str1 + ".txt",
+////					true);
+//
+//			FileOutputStream fileOutputStream = new FileOutputStream(file2, true);
+//			PrintStream printStream = new PrintStream(fileOutputStream);
+//			printStream.println("#" + str2 + "#" + str3 + "#" + paramString1);
+//			printStream.close();
+//			fileOutputStream.close();
+//		} catch (Exception exception) {
+//			// this.logger.debug("GOT Exception in LOG method as:" + exception);
+//		}
 	}
 
 	public String getdate(int paramInt) {

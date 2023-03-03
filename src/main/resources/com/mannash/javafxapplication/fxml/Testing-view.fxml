@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="850.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mannash.simcardvalidation.TestingController4">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="980.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mannash.simcardvalidation.TestingController4">
     <top>
         <HBox style="-fx-background-color: #D3D3D3;" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
             <children>
@@ -33,14 +33,14 @@
                             <Insets bottom="5.0" left="6.0" top="12.0" />
                         </HBox.margin>
                     </ImageView>
-               <MenuButton id="logOut" fx:id="logOut" mnemonicParsing="false" text="Log Out">
-                 <items>
-                   <MenuItem mnemonicParsing="false" fx:id="logOutButton" id="logOutButton" onAction="#logOut" text="Log Out" />
-                 </items>
-                  <HBox.margin>
-                     <Insets left="5.0" top="17.0" />
-                  </HBox.margin>
-               </MenuButton>
+                    <MenuButton id="logOut" fx:id="logOut" mnemonicParsing="false" text="Log Out">
+                        <items>
+                            <MenuItem id="logOutButton" fx:id="logOutButton" mnemonicParsing="false" onAction="#logOut" text="Log Out" />
+                        </items>
+                        <HBox.margin>
+                            <Insets left="5.0" top="17.0" />
+                        </HBox.margin>
+                    </MenuButton>
                     <HBox.margin>
                         <Insets right="15.0" />
                     </HBox.margin>
@@ -61,35 +61,35 @@
                                 <Font name="System Bold" size="14.0" />
                             </font></Label>
                         <TextField id="input_iccid" fx:id="input_iccid" layoutX="201.0" layoutY="14.0" prefHeight="31.0" prefWidth="252.0" promptText="Card ICCID" AnchorPane.topAnchor="12.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font></TextField>
+                            <font>
+                                <Font size="14.0" />
+                            </font></TextField>
                         <Separator layoutX="79.0" layoutY="93.0" prefHeight="3.0" prefWidth="374.0" />
                         <TextField id="input_imsi" fx:id="input_imsi" layoutX="201.0" layoutY="49.0" prefHeight="31.0" prefWidth="252.0" promptText="Card IMSI" AnchorPane.topAnchor="45.0">
-                     <font>
-                        <Font size="14.0" />
-                     </font></TextField>
+                            <font>
+                                <Font size="14.0" />
+                            </font></TextField>
                         <Label layoutX="88.0" layoutY="52.0" text="Card IMSI">
                             <font>
                                 <Font name="System Bold" size="14.0" />
                             </font></Label>
-                  <ImageView id="okImageView" fx:id="okImageView" disable="true" fitHeight="88.0" fitWidth="121.0" layoutX="591.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView id="okImageView" fx:id="okImageView" disable="true" fitHeight="88.0" fitWidth="96.0" layoutX="579.0" layoutY="4.0" pickOnBounds="true" preserveRatio="true" />
                     </children>
                 </AnchorPane>
             </VBox>
             <VBox>
-                <AnchorPane id="mainAnchorPane" fx:id="mainAnchorPane" prefHeight="325.0" prefWidth="811.0" style="-fx-background-color: #ffffff;" BorderPane.alignment="CENTER">
+                <AnchorPane id="mainAnchorPane" fx:id="mainAnchorPane" prefHeight="385.0" prefWidth="914.0" style="-fx-background-color: #ffffff;" BorderPane.alignment="CENTER">
                     <children>
-                        <VBox alignment="BOTTOM_LEFT" layoutX="85.0" layoutY="36.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="288.0" prefWidth="387.0" spacing="10" style="-fx-alignment: center;" AnchorPane.leftAnchor="85.0" AnchorPane.topAnchor="36.0">
+                        <VBox alignment="BOTTOM_LEFT" layoutX="80.0" layoutY="29.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="349.0" prefWidth="387.0" spacing="10" style="-fx-alignment: center;" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="29.0">
                             <children>
-                                <HBox spacing="260">
+                                <HBox spacing="261">
                                     <children>
                                         <Label prefHeight="17.0" prefWidth="91.0" text="SIM Heartbeat">
                                             <font>
                                                 <Font name="System Bold" size="12.0" />
                                             </font>
                                         </Label>
-                                        <ImageView id="img_test_status_1" fx:id="img_test_status_1" fitHeight="17.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                        <ImageView id="img_test_status_1" fx:id="img_test_status_1" fitHeight="18.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                                             <image>
                                                 <Image url="@images/greycircle.png" />
                                             </image>
@@ -106,7 +106,7 @@
                                             </font>
                                         </Label>
 
-                                        <ImageView id="img_test_status_2" fx:id="img_test_status_2" fitHeight="17.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                        <ImageView id="img_test_status_2" fx:id="img_test_status_2" fitHeight="18.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                                             <image>
                                                 <Image url="@images/greycircle.png" />
                                             </image>
@@ -123,7 +123,7 @@
                                         </font>
                                     </Label>
 
-                                    <ImageView id="img_test_status_3" fx:id="img_test_status_3" fitHeight="17.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                    <ImageView id="img_test_status_3" fx:id="img_test_status_3" fitHeight="18.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                                         <image>
                                             <Image url="@images/greycircle.png" />
                                         </image>
@@ -132,13 +132,13 @@
                                 <Separator prefWidth="200" />
 
 
-                                <HBox spacing="260">
+                                <HBox spacing="259">
                                     <Label text="Read/Write Test">
                                         <font>
                                             <Font name="System Bold" size="12.0" />
                                         </font>
                                     </Label>
-                                    <ImageView id="img_test_status_4" fx:id="img_test_status_4" fitHeight="17.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                    <ImageView id="img_test_status_4" fx:id="img_test_status_4" fitHeight="18.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                                         <image>
                                             <Image url="@images/greycircle.png" />
                                         </image>
@@ -146,32 +146,55 @@
                                 </HBox>
                                 <Separator prefWidth="200" />
 
-                                <HBox spacing="218">
+                                <HBox spacing="217">
                                     <Label text="Test Result Compilation">
                                         <font>
                                             <Font name="System Bold" size="12.0" />
                                         </font>
                                     </Label>
-                                    <ImageView id="img_test_status_5" fx:id="img_test_status_5" fitHeight="17.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                    <ImageView id="img_test_status_5" fx:id="img_test_status_5" fitHeight="18.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                         <image>
                                             <Image url="@images/greycircle.png" />
                                         </image>
                                     </ImageView>
                                 </HBox>
                             </children>
-                            <HBox alignment="CENTER">
-                                <ImageView id="img_test_button" fx:id="img_test_button" fitHeight="65.0" fitWidth="144.0" layoutX="132.0" layoutY="27.0" onMouseClicked="#onButtonPress" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
+                            <VBox id="radioOptionsVBox" fx:id="radioOptionsVBox" prefHeight="88.0" prefWidth="387.0" visible="false" VBox.vgrow="ALWAYS">
+                                <children>
+                                    <HBox prefHeight="7.0" prefWidth="387.0">
+                                        <children>
+                                            
+                                            <Separator prefHeight="0.0" prefWidth="652.0" />
+                                        </children>
+                              <VBox.margin>
+                                 <Insets bottom="6.0" />
+                              </VBox.margin>
+                                    </HBox>
+                                    <HBox id="messageHbox" prefHeight="52.0" prefWidth="387.0">
+                                        <Label id="messageTextArea" fx:id="messageTextArea" contentDisplay="CENTER" layoutX="698.0" layoutY="15.0" prefHeight="51.0" prefWidth="376.0" visible="false" />
+                                    </HBox>
+                                </children>
+                                <VBox.margin>
+                                    <Insets top="5.0" />
+                                </VBox.margin>
+                            </VBox>
+
+                                  <HBox alignment="CENTER" prefHeight="85.0" prefWidth="387.0">
+                                <ImageView id="img_test_button" fx:id="img_test_button" fitHeight="75.0" fitWidth="200.0" layoutX="132.0" layoutY="27.0" onMouseClicked="#onButtonPress" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
                                     <image>
-                                        <Image url="@images/startTest.gif" />
+                                        <Image url="@images/button_Start_Testing6.png" />
                                     </image>
                                     <HBox.margin>
-                                        <Insets top="16.0" />
+                                        <Insets top="-18.0" />
                                     </HBox.margin>
                                 </ImageView>
+                        <VBox.margin>
+                           <Insets />
+                        </VBox.margin>
                             </HBox>
                         </VBox>
 
-                        <VBox id="simCardVbox" fx:id="simCardVbox" alignment="CENTER" layoutX="511.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="299.0" prefWidth="316.0" style="-fx-background-color: white;">
+                        <VBox id="simCardVbox" fx:id="simCardVbox" alignment="CENTER" layoutX="572.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="350.0" prefWidth="379.0" style="-fx-background-color: white;">
                             <children>
                                 <ImageView id="img_status" fx:id="img_status" fitHeight="296.0" fitWidth="198.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -188,6 +211,15 @@
             </VBox>
         </SplitPane>
     </center>
+   <bottom>
+      <ImageView id="bottomImage" fitHeight="100.0" fitWidth="980.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+          <image>
+              <Image url="@images/footer5.png" />
+          </image>
+      </ImageView>
+
+
+   </bottom>
 
 
 

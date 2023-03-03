@@ -61,8 +61,8 @@ public class LoginFormController {
 
 
 
+        if (userId.equalsIgnoreCase("store1@airtel.in") && password.equalsIgnoreCase(hardCodePassword)){
 
-        if (userId.equalsIgnoreCase(hardCodeUserId) && password.equalsIgnoreCase(hardCodePassword)){
             Parent mainPage = FXMLLoader.load(getClass().getResource("/com/mannash/javafxapplication/fxml/Testing-view.fxml"));
 //        Scene primaryScene = loginButton.getScene();
             Stage primaryStage = (Stage) loginButton.getScene().getWindow();
@@ -73,7 +73,51 @@ public class LoginFormController {
             Scene scene = new Scene(mainPage);
             stage.getIcons().add(icon);
             stage.setScene(scene);
+            stage.setResizable(false);
             stage.setTitle("SIM Verify!");
+//            stage.setResizable(false);
+
+//            MenuButton logOut = (MenuButton) scene.lookup("#logOut");
+//            logOut.setText(userId);
+            stage.show();
+        }
+
+        else if (userId.equalsIgnoreCase("simlab@airtel.in") && password.equalsIgnoreCase(hardCodePassword)){
+            Parent mainPage = FXMLLoader.load(getClass().getResource("/com/mannash/javafxapplication/fxml/Testing-view.fxml"));
+//        Scene primaryScene = loginButton.getScene();
+            Stage primaryStage = (Stage) loginButton.getScene().getWindow();
+            primaryStage.close();
+//        primaryStage.setScene(primaryScene);
+            Image icon = new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png");
+            Stage stage = new Stage();
+            Scene scene = new Scene(mainPage);
+            stage.getIcons().add(icon);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle("SIM Verify!");
+//            stage.setResizable(false);
+
+//            MenuButton logOut = (MenuButton) scene.lookup("#logOut");
+//            logOut.setText(userId);
+            stage.show();
+        }
+
+
+
+        else if (userId.equalsIgnoreCase(hardCodeUserId) && password.equalsIgnoreCase(hardCodePassword)){
+            Parent mainPage = FXMLLoader.load(getClass().getResource("/com/mannash/javafxapplication/fxml/Testing-view.fxml"));
+//        Scene primaryScene = loginButton.getScene();
+            Stage primaryStage = (Stage) loginButton.getScene().getWindow();
+            primaryStage.close();
+//        primaryStage.setScene(primaryScene);
+            Image icon = new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png");
+            Stage stage = new Stage();
+            Scene scene = new Scene(mainPage);
+            stage.getIcons().add(icon);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.setTitle("SIM Verify!");
+//            stage.setResizable(false);
 
 //            MenuButton logOut = (MenuButton) scene.lookup("#logOut");
 //            logOut.setText(userId);

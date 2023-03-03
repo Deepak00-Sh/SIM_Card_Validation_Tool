@@ -67,9 +67,9 @@ public class FieldTestingLoggerThread extends Thread {
 //						     bw.newLine();
 //						}
 //					}
-					trakmeServerCommunicationServiceImpl.sendLogsToServer(requestLogPojos);
+//					trakmeServerCommunicationServiceImpl.sendLogsToServer(requestLogPojos);
 					
-					requestLogPojos.clear();
+//					requestLogPojos.clear();
 				}
 				
 				Thread.sleep(1000);

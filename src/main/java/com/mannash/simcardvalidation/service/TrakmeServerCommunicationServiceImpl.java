@@ -450,42 +450,44 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 
 	public String sendLogsToServer(List<RequestClientLogPojo> requestLogPojos) {
 
-		CloseableHttpClient client = HttpClients.createDefault();
-		try {
-
-			String logPushUrl = "http://localhost:8080/trakmeserver/api/external/fieldtest/logs/post";
-			HttpPost post = new HttpPost(logPushUrl);
-			RequestClientLogsPojo pushRequest = new RequestClientLogsPojo();
-			pushRequest.setRequestClientLogPojos(requestLogPojos);
-
-			Gson gson = new Gson();
-
-			StringEntity input = new StringEntity(gson.toJson(pushRequest));
-			input.setContentType("application/json");
-			post.setEntity(input);
-
-			// this.logger.info("Sending logs to server");
-
-			CloseableHttpResponse response = client.execute(post);
-
-			String responseString = EntityUtils.toString(response.getEntity());
-
-//			  ServerResponseLogPojo serverResponse = (ServerResponseLogPojo) gson.fromJson(responseString, ServerResponseLogPojo.class);
-			String status = "OK";
-			return status;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		finally {
-			try {
-				client.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+//
+//		CloseableHttpClient client = HttpClients.createDefault();
+//		try {
+//
+//			String logPushUrl = "http://localhost:8080/trakmeserver/api/external/fieldtest/logs/post";
+//			HttpPost post = new HttpPost(logPushUrl);
+//			RequestClientLogsPojo pushRequest = new RequestClientLogsPojo();
+//			pushRequest.setRequestClientLogPojos(requestLogPojos);
+//
+//			Gson gson = new Gson();
+//
+//			StringEntity input = new StringEntity(gson.toJson(pushRequest));
+//			input.setContentType("application/json");
+//			post.setEntity(input);
+//
+//			// this.logger.info("Sending logs to server");
+//
+//			CloseableHttpResponse response = client.execute(post);
+//
+//			String responseString = EntityUtils.toString(response.getEntity());
+//
+////			  ServerResponseLogPojo serverResponse = (ServerResponseLogPojo) gson.fromJson(responseString, ServerResponseLogPojo.class);
+//			String status = "OK";
+//			return status;
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//
+//		finally {
+//			try {
+//				client.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+		return null;
 	}
 
 	public ResponseStressTestingConfig getStressTestingConfig(String iccid, String woId, String userName) {

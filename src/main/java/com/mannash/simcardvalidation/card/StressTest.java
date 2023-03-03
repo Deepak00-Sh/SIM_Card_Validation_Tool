@@ -144,29 +144,15 @@ public class StressTest {
 					String time;
 					String stressTimeStamp;
 					String updatedSmsContent;
-					for (double j = this.loopStrtCnt; j <= this.loopCount; j++) {
+					for (double j = 1; j <= this.loopCount; j++) {
 						System.out.println("Loop counts : " + j);
 						controller.displayLogs(_terminal,_card,"Read/Write cycle : " + (int)j);
-						if (j % 100 == 0) {
-							System.out.println("Stress loop counts : " + j);
-						}
 
 //						System.out.println("Stress loop counts : "+j);
 //						//TODO System.out.println("Stress loop count : " + (int) Math. round(j));
 						if (!this.run)
 							break;
-						if (((j * 100) / this.loopCount) % 1 == 0) {
-							// Send counter update to server
-//							long counterToSendServer =  (long) (j);
-//							this.updateStageCounter(this.ICCID, this.woId, this.stageId, counterToSendServer);
-							this.updateLoopCounterLocal(this.ICCID, this.woId, (long) j);
-							// TODO System.out.println("Stress current loop count : "+(long)j);
-						}
 
-//						// TODO to be deleted
-//						if (j == this.loopCount) {
-//							this.updateStageCounter(this.ICCID, this.woId, this.stageId, (long) j);
-//						}
 
 						if (j == this.loopCount) {
 							log("TERMINAL " + this.terminalNumber + " ## " + this.ICCID
@@ -197,6 +183,7 @@ public class StressTest {
 
 						// creating stress reverse APDU list
 						if (j == 1) {
+
 							for (int i = 0; i < this.reverseStress.size(); i++) {
 								try {
 									System.out.println(this.reverseStress.get(i));
@@ -231,20 +218,24 @@ public class StressTest {
 								}
 							}
 							try {
-								createReverseStressConfig();
+//								createReverseStressConfig();
 							} catch (Exception e) {
 								this.logger.debug(e.toString(), this.ICCID, this.woId);
 								this.loggerService.log(e.toString(), this.ICCID, this.woId, LogType.ERROR);
 							}
 							System.out.println("List : " + this.reverseStress);
 						}
+						System.out.println("Array of string : "+arrayOfString.length);
 						for (int b1 = 0; b1 < arrayOfString.length; b1++) {
+							System.out.println("B = "+b1 +" J = "+j);
 							if (arrayOfString[b1].equals("SETAID")) {
 								if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
 									return false;
 								}
 								continue;
 							} else if (arrayOfString[b1].equals("RESET")) {
+								System.out.println("calling reset");
+								controller.displayLogs(_terminal, _card,"Calling reset");
 								try {
 									if (!resetChannel()) {
 										return false;
@@ -255,37 +246,15 @@ public class StressTest {
 								continue;
 							}
 
-							if (b1 == indexOfSms) {
-//								System.out.println(arrayOfString[b1]);
-
-								date = formatN("" + calendar.get(5), 2) + formatN("" + (calendar.get(2) + 1), 2)
-										+ formatN("" + calendar.get(1), 4);
-								time = formatN("" + calendar.get(11), 2) + formatN("" + calendar.get(12), 2);
-
-//								System.out.println("Date : " + date);
-//								System.out.println("time : " + time);
-
-								stressTimeStamp = "AB" + date + "AB" + time + "AB" + String.format("%08.0f", j);
-								updatedSmsContent = arrayOfString[b1].substring(0, 10) + stressTimeStamp
-										+ arrayOfString[b1].substring(36);
-//								System.out.println(updatedSmsContent);
-								if (!sendRawApduNoPrint(updatedSmsContent)) {
-									return false;
-								}
-
-//								log("COMMAND  : " + arrayOfString[b1] + " CONTENT :" + str1,
-//										"STRESS_TEST_" + this.woId + "_" + this.ICCID + "_",
-//										this.log_path + this.terminalNumber + "/");
-								log("COMMAND  : " + updatedSmsContent + " RESPONSE :" + getSW1Text() + getSW2Text(),
-										"STRESS_TEST_" + this.woId + "_" + this.ICCID + "_",
-										this.log_path + this.terminalNumber + "/");
-
-								continue;
-							}
-
 							if (!sendRawApduNoPrint(arrayOfString[b1])) {
+								System.out.println("false 1");
 								return false;
 							}
+
+							if (!getSW1Text().equalsIgnoreCase("90") && !getSW1Text().equalsIgnoreCase("9F")){
+								return false;
+							}
+
 							String str1 = getResponse();
 
 							if (j < 2 && !str1.equals("")) {
@@ -496,6 +465,8 @@ public class StressTest {
 								}
 								continue;
 							} else if (arrayOfString[b1].equals("RESET")) {
+								System.out.println("calling reset");
+								controller.displayLogs(_terminal, _card,"Calling reset");
 								try {
 									if (!resetChannel()) {
 										return false;
@@ -503,6 +474,7 @@ public class StressTest {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
+								controller.displayLogs(_card,_terminal,"Reset success");
 								continue;
 							} else if (arrayOfString[b1].equals("00A40004026F3C")) {
 								String date = formatN("" + calendar.get(5), 2) + formatN("" + (calendar.get(2) + 1), 2)
@@ -643,7 +615,7 @@ public class StressTest {
 		paramString = paramString.toUpperCase();
 		paramString = paramString.replaceAll(" ", "");
 		// this.logger.debug("Param String in send cmd :-" + paramString);
-//		controller.displayLogs(_terminal,_card,paramString);
+		controller.displayLogs(_terminal,_card,paramString);
 
 		try {
 			if (getTerminal().isCardPresent())
@@ -739,7 +711,7 @@ public class StressTest {
 							this._SW = Integer.toHexString(responseAPDU.getSW());
 							this._SW1 = (byte) responseAPDU.getSW1();
 							this._SW2 = (byte) responseAPDU.getSW2();
-//							controller.displayLogs(_card,_terminal, this._SW);
+							controller.displayLogs(_card,_terminal, this._SW);
 						} catch (Exception exception) {
 
 							exception.printStackTrace();
@@ -929,40 +901,40 @@ public class StressTest {
 
 	public void log(String logText, String logFileName, String noInUse) {
 
-		try {
-			this.loggerService.log(logText, this.ICCID, this.woId, LogType.DEBUG);
-
-//			Calendar calendar = Calendar.getInstance();
-			@SuppressWarnings("unused")
-			String str2 = formatN("" + calendar.get(1), 4) + formatN("" + (calendar.get(2) + 1), 2)
-					+ formatN("" + calendar.get(5), 2);
-			String str3 = formatN("" + calendar.get(11), 2) + formatN("" + calendar.get(12), 2)
-					+ formatN("" + calendar.get(13), 2);
-			String str4 = getdate(1);
-			String str5 = str4.substring(0, 6);
-//			System.out.println("str5 : "+str5);
-
-//			File file = new File(this.properties.getProperty("stressLogPath"));
-			File file2 = new File(this.localStressLogPath + logFileName + str2 + ".txt");
-			if (!file2.exists()) {
-				file2.createNewFile();
-			}
-
-//      if (!file.exists() || !file.isDirectory())
-//        file.mkdir(); 
-			FileOutputStream fileOutputStream = new FileOutputStream(file2, true);
-			PrintStream printStream = new PrintStream(fileOutputStream);
-			if (logText.contains("STRESS TEST ITERATION NUMBER")) {
-				printStream.println("#" + str2 + "#" + str3 + " #" + logText);
-			} else {
-				printStream.println(logText);
-			}
-
-			printStream.close();
-			fileOutputStream.close();
-		} catch (Exception exception) {
-			// this.logger.error("GOT Exception in LOG method as:" + exception);
-		}
+//		try {
+//			this.loggerService.log(logText, this.ICCID, this.woId, LogType.DEBUG);
+//
+////			Calendar calendar = Calendar.getInstance();
+//			@SuppressWarnings("unused")
+//			String str2 = formatN("" + calendar.get(1), 4) + formatN("" + (calendar.get(2) + 1), 2)
+//					+ formatN("" + calendar.get(5), 2);
+//			String str3 = formatN("" + calendar.get(11), 2) + formatN("" + calendar.get(12), 2)
+//					+ formatN("" + calendar.get(13), 2);
+//			String str4 = getdate(1);
+//			String str5 = str4.substring(0, 6);
+////			System.out.println("str5 : "+str5);
+//
+////			File file = new File(this.properties.getProperty("stressLogPath"));
+//			File file2 = new File(this.localStressLogPath + logFileName + str2 + ".txt");
+//			if (!file2.exists()) {
+//				file2.createNewFile();
+//			}
+//
+////      if (!file.exists() || !file.isDirectory())
+////        file.mkdir();
+//			FileOutputStream fileOutputStream = new FileOutputStream(file2, true);
+//			PrintStream printStream = new PrintStream(fileOutputStream);
+//			if (logText.contains("STRESS TEST ITERATION NUMBER")) {
+//				printStream.println("#" + str2 + "#" + str3 + " #" + logText);
+//			} else {
+//				printStream.println(logText);
+//			}
+//
+//			printStream.close();
+//			fileOutputStream.close();
+//		} catch (Exception exception) {
+//			// this.logger.error("GOT Exception in LOG method as:" + exception);
+//		}
 	}
 
 	private String formatN(String paramString, int paramInt) {

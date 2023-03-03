@@ -13,26 +13,28 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.NodeOrientation;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javax.smartcardio.Card;
+import javax.smartcardio.CardChannel;
 import javax.smartcardio.CardException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 
-public class TestingController4 extends LoginFormController{
+public class TestingController4 extends LoginFormController implements Initializable {
 
     public TestingController4() {
         this.loggerService = new LoggerServiceImpl();
@@ -66,6 +68,24 @@ public class TestingController4 extends LoginFormController{
     private TextField input_imsi;
     @FXML
     private ImageView okImageView;
+
+    //new impl
+    @FXML
+    private RadioButton radioButton1;
+
+    @FXML
+    private RadioButton radioButton2;
+
+    @FXML
+    private RadioButton radioButton3;
+
+    private ToggleGroup toggleGroup;
+
+    @FXML
+    private VBox radioOptionsVBox;
+    @FXML
+    private Label messageTextArea;
+    //
 
     private Task<Boolean> task1;
     private Task<Boolean> task2;
@@ -102,8 +122,8 @@ public class TestingController4 extends LoginFormController{
         return terminal;
     }
 
-    public void setTerminal(TerminalInfo terminal) {
-        this.terminal = terminal;
+    public void setTerminal(TerminalInfo _terminal) {
+        terminal = _terminal;
     }
 
     public boolean isAtr() {
@@ -118,8 +138,8 @@ public class TestingController4 extends LoginFormController{
         return fileSystemVerification;
     }
 
-    public void setFileSystemVerification(boolean fileSystemVerification) {
-        this.fileSystemVerification = fileSystemVerification;
+    public void setFileSystemVerification(boolean _fileSystemVerification) {
+        fileSystemVerification = _fileSystemVerification;
     }
 
     public boolean isProfileTesting() {
@@ -186,6 +206,7 @@ public class TestingController4 extends LoginFormController{
     public String _card = "C";
     public String _device = "D";
     public String _ui = "UI";
+    CardChannel cardChannel;
 
 
 
@@ -193,14 +214,27 @@ public class TestingController4 extends LoginFormController{
     Image greenCheck = new Image("/com/mannash/javafxapplication/fxml/images/green_check.png");
     Image redCross = new Image("/com/mannash/javafxapplication/fxml/images/crossicon.png");
     Image okImage = new Image("/com/mannash/javafxapplication/fxml/images/ok.jpg");
-    Image cancelButtonImage = new Image("/com/mannash/javafxapplication/fxml/images/cancel_Image.gif");
-    Image doneImage = new Image("/com/mannash/javafxapplication/fxml/images/done.gif");
+    Image cancelButtonImage = new Image("/com/mannash/javafxapplication/fxml/images/button_cancel.png");
+//    Image doneImage = new Image("/com/mannash/javafxapplication/fxml/images/done.gif");
+    Image simOk = new Image("/com/mannash/javafxapplication/fxml/images/button_OK.png");
+    Image simFaulty = new Image("/com/mannash/javafxapplication/fxml/images/button_SIM_Faulty.png");
     Image notOkImage = new Image("/com/mannash/javafxapplication/fxml/images/nok.png");
+    Image loadingGif = new Image ("/com/mannash/javafxapplication/fxml/images/loading10.gif");
     List<Thread> threadList = new ArrayList<>();
     TextArea logTextArea = new TextArea();
     ScrollPane pane;
 
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.toggleGroup = new ToggleGroup();
+
+//        radioButton1.setToggleGroup(toggleGroup);
+//        radioButton2.setToggleGroup(toggleGroup);
+//        radioButton3.setToggleGroup(toggleGroup);
+//        toggleGroup.selectToggle(radioButton1);
+
+    }
 
     public void onStartButtonPress() {
         img_test_button.setImage(cancelButtonImage);
@@ -214,6 +248,7 @@ public class TestingController4 extends LoginFormController{
         logTextArea.getStyleClass().add("text-area-left-aligned");
         this.pane = pane;
         pane = new ScrollPane(logTextArea);
+        Node horizontalScrollBar = pane.lookup(".scroll-bar:horizontal");if (horizontalScrollBar != null) {    horizontalScrollBar.setStyle("-fx-pref-width: 1px;");}
         pane.setFitToWidth(true);
         pane.setFitToHeight(true);
         pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -301,12 +336,13 @@ public class TestingController4 extends LoginFormController{
                 Platform.runLater(() -> {
                     //set iccid in UI
                     if (result) {
-
+                        img_test_status_1.setImage(loadingGif);
                         displayLogs(_terminal,_ui,"Print ICCID");
                         input_iccid.setText(getLocalIccid());
                         displayLogs(_terminal,_ui,"Print IMSI");
                         input_imsi.setText(getImsi());
                         img_test_status_1.setImage(greenCheck);
+                        img_test_status_2.setImage(loadingGif);
                     } else {
                         displayLogs(_terminal,"SIM Heartbeat failed");
                         img_test_status_1.setImage(redCross);
@@ -318,8 +354,11 @@ public class TestingController4 extends LoginFormController{
                         img_test_status_4.setImage(redCross);
 //                        displayLogs(_terminal,_card,"Skipping Result Compilation");
                         img_test_status_5.setImage(redCross);
-                        okImageView.setImage(notOkImage);
-                        img_test_button.setImage(doneImage);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
                     }
 
                 });
@@ -343,6 +382,7 @@ public class TestingController4 extends LoginFormController{
                     if (result) {
                         displayLogs(_terminal,_card,"File Verification done");
                         img_test_status_2.setImage(greenCheck);
+                        img_test_status_3.setImage(loadingGif);
                     } else {
                         displayLogs(_terminal,"File Verification failed");
                         img_test_status_2.setImage(redCross);
@@ -352,8 +392,11 @@ public class TestingController4 extends LoginFormController{
                         img_test_status_4.setImage(redCross);
 //                        displayLogs(_terminal,"Skipping Result Compilation");
                         img_test_status_5.setImage(redCross);
-                        okImageView.setImage(notOkImage);
-                        img_test_button.setImage(doneImage);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
                     }
 
                 });
@@ -378,6 +421,7 @@ public class TestingController4 extends LoginFormController{
                     if (result) {
                         displayLogs(_terminal,"Profile Verification done");
                         img_test_status_3.setImage(greenCheck);
+                        img_test_status_4.setImage(loadingGif);
                     } else {
                         displayLogs(_terminal,"Profile Verification failed");
                         img_test_status_3.setImage(redCross);
@@ -385,8 +429,11 @@ public class TestingController4 extends LoginFormController{
                         img_test_status_4.setImage(redCross);
 //                        displayLogs(_terminal,"Skipping Result Compilation");
                         img_test_status_5.setImage(redCross);
-                        okImageView.setImage(notOkImage);
-                        img_test_button.setImage(doneImage);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
                     }
 
                 });
@@ -408,12 +455,16 @@ public class TestingController4 extends LoginFormController{
                 Platform.runLater(() -> {
                     if (result) {
                         img_test_status_4.setImage(greenCheck);
+                        img_test_status_5.setImage(loadingGif);
                     } else {
                         displayLogs(_terminal,"Read/Write Test failed");
                         img_test_status_4.setImage(redCross);
                         img_test_status_5.setImage(redCross);
-                        okImageView.setImage(notOkImage);
-                        img_test_button.setImage(doneImage);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
                     }
 
                 });
@@ -434,16 +485,22 @@ public class TestingController4 extends LoginFormController{
                 Platform.runLater(() -> {
                     if (result) {
                         img_test_status_5.setImage(greenCheck);
-                        img_test_button.setImage(doneImage);
+                        img_test_button.setImage(simOk);
 //                        simCardVbox.getChildren().remove(this.pane);
 //                        simCardVbox.getChildren().add(img_status);
 //                        img_status.setImage(okImage);
-                        okImageView.setImage(okImage);
+//                        okImageView.setImage(okImage);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setText("SIM Card is not faulty, please check other SOP if problem persists");
 
                     } else {
                         img_test_status_5.setImage(redCross);
-                        okImageView.setImage(notOkImage);
-                        img_test_button.setImage(doneImage);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
                     }
 
                 });
@@ -458,16 +515,20 @@ public class TestingController4 extends LoginFormController{
 
 
     public void onButtonPress() throws IOException, CardException {
-        if(img_test_button.getImage().getUrl().contains("startTest.gif")){
+        if(img_test_button.getImage().getUrl().contains("button_Start_Testing")){
             System.out.println("inside the startTest..................");
             displayLogs(_terminal,"Verification started");
             onStartButtonPress();
-        } else if (img_test_button.getImage().getUrl().contains("cancel_Image.gif")) {
+        } else if (img_test_button.getImage().getUrl().contains("button_cancel.png")) {
             displayLogs(_terminal,"Verification process cancelled");
             System.out.println("inside the cancel ........................");
             cancelAllThreads();
             loadTestingWindow();
-        } else if (img_test_button.getImage().getUrl().contains("done.gif")) {
+        } else if (img_test_button.getImage().getUrl().contains("button_OK.png")) {
+            System.out.println("inside the done.............................");
+            loadTestingWindow();
+        }
+        else if (img_test_button.getImage().getUrl().contains("button_SIM_Faulty.png")) {
             System.out.println("inside the done.............................");
             loadTestingWindow();
         }
@@ -482,11 +543,12 @@ public class TestingController4 extends LoginFormController{
         primaryStage.show();
     }
 
-    private void loadTestingWindow() throws IOException {
+    private void loadTestingWindow() throws IOException{
         Parent testingPage = FXMLLoader.load(getClass().getResource("/com/mannash/javafxapplication/fxml/Testing-view.fxml"));
         Stage primaryStage = (Stage) img_test_button.getScene().getWindow();
         Scene scene = new Scene(testingPage);
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
@@ -513,6 +575,7 @@ public class TestingController4 extends LoginFormController{
     }
 
     private boolean initializeTerminal() throws CardException {
+        displayLogs(_terminal,_card,"Calling fetchterminal");
         TerminalConnectService terminalConnectService = new TerminalConnectServiceImpl(this);
         List<TerminalInfo> terminalInfos = terminalConnectService.fetchTerminalInfo();
         if(terminalInfos.size()==0) {

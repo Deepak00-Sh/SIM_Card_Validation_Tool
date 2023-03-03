@@ -144,11 +144,11 @@ public class FileSystemVerification {
 				if (!config) {
 					return false;
 				}
-				boolean configContent = readConfigContent();
-				if (!configContent) {
-					return false;
-				}
-				updateSmsContent();
+//				boolean configContent = readConfigContent();
+//				if (!configContent) {
+//					return false;
+//				}
+//				updateSmsContent();
 				
 			} else {
 				// this.logger.debug("ADM verify failed !! ............");
@@ -341,170 +341,13 @@ public class FileSystemVerification {
 			String str2 = paramArrayOfString[1];
 			gotoFile(paramArrayOfString[1]);
 			controller.displayLogs(_terminal,_card,"00A4000402" + str1);
-			controller.displayLogs(_card,_terminal,getSW1Text()+getSW2Text());
+
 			if (!sendRawApduNoPrint("00A4000402" + str1)) {
 				return false;
 			}
-			if (getSW1Text().equals("90")) {
-				String str3 = insertSpace(getResponse());
-				StringTokenizer stringTokenizer = new StringTokenizer(str3, " ");
-				int i = stringTokenizer.countTokens();
-				byte b1 = 0, b2 = 0, b3 = 0, b4 = 0;
-				String str4 = "", str5 = "";
-				String[] arrayOfString1 = new String[i];
-				if (stringTokenizer.hasMoreTokens())
-					for (byte b = 0; b < i; b++) {
-						arrayOfString1[b] = stringTokenizer.nextToken();
-						if (arrayOfString1[b].equals("82")) {
-							if (b1 == 0)
-								b1 = b; // value for the file descriptor
-						}
-						if (arrayOfString1[b].equals("83")) {
-							if (b3 == 0)
-								b3 = b; // value for the file ID
-						}
-						if (arrayOfString1[b].equals("80")) {
-							// // this.logger.debug("Bvalue"+b);
-							// // this.logger.debug("IValue"+i);
-							if (b + 1 != i)
-								b2 = b; // value for the length of record and file size
-						}
-						if (arrayOfString1[b].equals("8B")) {
-							if (b4 == 0)
-								b4 = b;// value for the access conditions
-						}
-
-					}
-				String str6 = "", str8 = "", str9 = "", str10 = "", str11 = "", str12 = "";
-				String[] arrayOfString2 = new String[20];
-				String[] arrayOfString3 = { "FILE ID", "FILE PATH", "FILE TYPE", "READ CONDITION", "UPDATE CONDITION",
-						"INVALIDATE CONDITION", "REHABILITATE CONDITION", "OTA UPDATABLE", "RECORD SIZE",
-						"RECORD COUNT", "FILE SIZE" };
-				String str13 = arrayOfString1[b1 + 2];
-				String str14 = arrayOfString1[b3 + 2] + arrayOfString1[b3 + 3];
-				int j = Integer.parseInt(arrayOfString1[b2 + 2] + arrayOfString1[b2 + 3], 16), k = 0, m = 0, n = 0,
-						i1 = 0;
-				if (b4 != 0) {
-					String str21 = arrayOfString1[b4 + 1];
-					if (str21.equals("03")) {
-						str4 = arrayOfString1[b4 + 2] + arrayOfString1[b4 + 3];
-						str5 = arrayOfString1[b4 + 4];
-					} else if (str21.equals("06")) {
-						str4 = arrayOfString1[b4 + 2] + arrayOfString1[b4 + 3];
-						str5 = arrayOfString1[b4 + 5];
-					} else {
-						this.logger.debug(
-								"AM_DO Condition not matching with the expended condition, may be compact access rules are defined");
-					}
-				} else {
-					str4 = "2F06";
-					str5 = "01";
-				}
-//				str4 = arrayOfString1[b4 + 2] + arrayOfString1[b4 + 3];
-//				str5 = arrayOfString1[b4 + 4];
-				String str15 = readAMDO(str4, str5, str2);
-				if (str15.equals(str4)) {
-				} else {
-					str12 = getAccessRight(str15);
-					i1 = str12.indexOf(",", 0);
-					str8 = str12.substring(0, i1);
-					n = i1 + 1;
-					i1 = str12.indexOf(",", n + 1);
-					str9 = str12.substring(n, i1);
-					n = i1 + 1;
-					i1 = str12.indexOf(",", n + 1);
-					str11 = str12.substring(n, i1);
-					n = i1 + 1;
-					i1 = str12.length();
-					str10 = str12.substring(n, i1);
-				}
-				if (!str13.equals("41")) {
-					k = Integer.parseInt(arrayOfString1[b1 + 4] + arrayOfString1[b1 + 5], 16);
-					m = Integer.parseInt(arrayOfString1[b1 + 6], 16);
-				}
-				switch (str13) {
-				case "41":
-					str6 = "T";
-					break;
-				case "42":
-					str6 = "LF";
-					break;
-				case "43":
-					str6 = "RFU";
-					break;
-				case "44":
-					str6 = "RFU";
-					break;
-				case "45":
-					str6 = "RFU";
-					break;
-				case "46":
-					str6 = "C";
-					break;
-				}
-				arrayOfString2[0] = str14;
-				arrayOfString2[1] = "NA";
-				paramArrayOfString[1] = "NA";
-				arrayOfString2[2] = str6;
-				arrayOfString2[3] = str8;
-				arrayOfString2[4] = str9;
-				arrayOfString2[5] = str11;
-				arrayOfString2[6] = str10;
-				arrayOfString2[7] = "NA";
-				paramArrayOfString[7] = "NA";
-				arrayOfString2[8] = Integer.toString(k);
-				arrayOfString2[9] = Integer.toString(m);
-				arrayOfString2[10] = Integer.toString(j);
-				if (str6.equals("T")) {
-					arrayOfString2[8] = "NA";
-					arrayOfString2[9] = "NA";
-				}
-//				for (byte b5 = 0; b5 <= 10; b5++) {
-//					if (!paramArrayOfString[b5].equals(arrayOfString2[b5])) {
-//						// this.logger.debug("\n" + str1 + "\t" + str2 + "   NOTMATCHED  " + arrayOfString3[b5] + " EXPVAL : " + paramArrayOfString[b5] + "  CARDVAL : " + arrayOfString2[b5]);
-//						if (!arrayOfString2[b5].equals(""))
-//							log(str1 + "\t" + str2 + "   NOTMATCHED  " + arrayOfString3[b5] + " EXPVAL : " + paramArrayOfString[b5] + "  CARDVAL : " + arrayOfString2[b5], "PROFILE_TEST_"+this.woId+"_" + this.ICCID + "_", log_path);
-//						
-//					}
-//				}
-				for (byte b5 = 0; b5 <= 10; b5++) {
-					if (!paramArrayOfString[b5].equals(arrayOfString2[b5])) {
-						// this.logger.debug("\n" + str1 + "\t" + str2 + " NOTMATCHED " +
-						// arrayOfString3[b5]+ " EXPVAL : " + paramArrayOfString[b5] + " CARDVAL : " +
-						// arrayOfString2[b5]);
-						log(str1 + "\t" + str2 + "   NOTMATCHED  " + arrayOfString3[b5] + " EXPVAL : "
-								+ paramArrayOfString[b5] + "  CARDVAL : " + arrayOfString2[b5],
-								"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-						if (!arrayOfString2[b5].equals(""))
-							log(str1 + "\t" + str2 + "   NOTMATCHED  " + arrayOfString3[b5] + " EXPVAL : "
-									+ paramArrayOfString[b5] + "  CARDVAL : " + arrayOfString2[b5],
-									"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-						// this.logger.debug(str1 + "\t" + str2 + " NOTMATCHED " + arrayOfString3[b5] +
-						// " EXPVAL : "+ paramArrayOfString[b5] + " CARDVAL : " + arrayOfString2[b5]);
-
-					} else if (!arrayOfString2[b5].equals("NA")) {
-						// this.logger.debug("\n" + str1 + "\t" + str2 + " MATCHED " +
-						// arrayOfString3[b5] + " EXPVAL : "+ paramArrayOfString[b5] + " CARDVAL : " +
-						// arrayOfString2[b5]);
-						log(str1 + "\t" + str2 + "   MATCHED  " + arrayOfString3[b5] + " EXPVAL : "
-								+ paramArrayOfString[b5] + "  CARDVAL : " + arrayOfString2[b5],
-								"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-						if (!arrayOfString2[b5].equals(""))
-							log(str1 + "\t" + str2 + "   MATCHED  " + arrayOfString3[b5] + " EXPVAL : "
-									+ paramArrayOfString[b5] + "  CARDVAL : " + arrayOfString2[b5],
-									"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-						// this.logger.debug(str1 + "\t" + str2 + " MATCHED " + arrayOfString3[b5] + "
-						// EXPVAL : "+ paramArrayOfString[b5] + " CARDVAL : " + arrayOfString2[b5]);
-					}
-				}
-
-			} else {
-				log("File not found !!" + str1 + " at path " + paramArrayOfString[1],
-						"PROFILE_TEST_" + this.woId + "_" + this.ICCID + "_", log_path);
-				this.loggerService.log("File not found !!" + str1 + " at path " + paramArrayOfString[1], this.ICCID,
-						this.woId, LogType.DEBUG);
-				this.logger.debug("File not found !!" + str1 + " at path " + paramArrayOfString[1], this.ICCID,
-						this.woId);
+			controller.displayLogs(_card,_terminal,getSW1Text()+getSW2Text());
+			if (!getSW1Text().equals("90")) {
+				controller.displayLogs(_terminal,"File System Verification failed");
 				return false;
 			}
 		} catch (Exception exception) {
