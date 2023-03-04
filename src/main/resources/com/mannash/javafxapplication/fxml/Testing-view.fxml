@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="980.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mannash.simcardvalidation.TestingController4">
+<BorderPane fx:id="mainBorderPane" id="mainBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="980.0" stylesheets="@application.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mannash.simcardvalidation.TestingController4">
     <top>
         <HBox style="-fx-background-color: #D3D3D3;" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
             <children>
