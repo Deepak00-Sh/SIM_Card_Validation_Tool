@@ -4,7 +4,6 @@ import com.mannash.simcardvalidation.card.FileSystemVerification;
 import com.mannash.simcardvalidation.card.ProfileTest3G;
 import com.mannash.simcardvalidation.card.StressTest;
 import com.mannash.simcardvalidation.pojo.TerminalInfo;
-import com.mannash.simcardvalidation.pojo.UserInfo;
 import com.mannash.simcardvalidation.service.LoggerService;
 import com.mannash.simcardvalidation.service.LoggerServiceImpl;
 import com.mannash.simcardvalidation.service.TerminalConnectService;
@@ -22,6 +21,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import javax.smartcardio.Card;
@@ -216,8 +216,8 @@ public class TestingController4 extends LoginFormController implements Initializ
     Image okImage = new Image("/com/mannash/javafxapplication/fxml/images/ok.jpg");
     Image cancelButtonImage = new Image("/com/mannash/javafxapplication/fxml/images/button_cancel.png");
 //    Image doneImage = new Image("/com/mannash/javafxapplication/fxml/images/done.gif");
-    Image simOk = new Image("/com/mannash/javafxapplication/fxml/images/button_OK.png");
-    Image simFaulty = new Image("/com/mannash/javafxapplication/fxml/images/button_SIM_Faulty.png");
+    Image simOk = new Image("/com/mannash/javafxapplication/fxml/images/button_OK.gif");
+    Image simFaulty = new Image("/com/mannash/javafxapplication/fxml/images/button_faulty.gif");
     Image notOkImage = new Image("/com/mannash/javafxapplication/fxml/images/nok.png");
     Image loadingGif = new Image ("/com/mannash/javafxapplication/fxml/images/loading10.gif");
     List<Thread> threadList = new ArrayList<>();
@@ -358,7 +358,8 @@ public class TestingController4 extends LoginFormController implements Initializ
                         img_test_button.setImage(simFaulty);
                         radioOptionsVBox.setVisible(true);
                         messageTextArea.setVisible(true);
-                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
+                        messageTextArea.setTextFill(Color.RED);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
                     }
 
                 });
@@ -396,7 +397,8 @@ public class TestingController4 extends LoginFormController implements Initializ
                         img_test_button.setImage(simFaulty);
                         radioOptionsVBox.setVisible(true);
                         messageTextArea.setVisible(true);
-                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
+                        messageTextArea.setTextFill(Color.RED);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
                     }
 
                 });
@@ -433,7 +435,8 @@ public class TestingController4 extends LoginFormController implements Initializ
                         img_test_button.setImage(simFaulty);
                         radioOptionsVBox.setVisible(true);
                         messageTextArea.setVisible(true);
-                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
+                        messageTextArea.setTextFill(Color.RED);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
                     }
 
                 });
@@ -464,7 +467,8 @@ public class TestingController4 extends LoginFormController implements Initializ
                         img_test_button.setImage(simFaulty);
                         radioOptionsVBox.setVisible(true);
                         messageTextArea.setVisible(true);
-                        messageTextArea.setText("Card is not healthy, please go for SIM swap");
+                        messageTextArea.setTextFill(Color.RED);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
                     }
 
                 });
@@ -492,7 +496,8 @@ public class TestingController4 extends LoginFormController implements Initializ
 //                        okImageView.setImage(okImage);
                         radioOptionsVBox.setVisible(true);
                         messageTextArea.setVisible(true);
-                        messageTextArea.setText("SIM Card is not faulty, please check other SOP if problem persists");
+                        messageTextArea.setTextFill(Color.GREEN);
+                        messageTextArea.setText("Card is OK, please check other SOP if problem persists");
 
                     } else {
                         img_test_status_5.setImage(redCross);
@@ -500,6 +505,7 @@ public class TestingController4 extends LoginFormController implements Initializ
                         img_test_button.setImage(simFaulty);
                         radioOptionsVBox.setVisible(true);
                         messageTextArea.setVisible(true);
+                        messageTextArea.setTextFill(Color.RED);
                         messageTextArea.setText("Card is faulty, please go for SIM swap");
                     }
 
@@ -524,11 +530,11 @@ public class TestingController4 extends LoginFormController implements Initializ
             System.out.println("inside the cancel ........................");
             cancelAllThreads();
             loadTestingWindow();
-        } else if (img_test_button.getImage().getUrl().contains("button_OK.png")) {
+        } else if (img_test_button.getImage().getUrl().contains("button_OK")) {
             System.out.println("inside the done.............................");
             loadTestingWindow();
         }
-        else if (img_test_button.getImage().getUrl().contains("button_SIM_Faulty.png")) {
+        else if (img_test_button.getImage().getUrl().contains("button_faulty")) {
             System.out.println("inside the done.............................");
             loadTestingWindow();
         }

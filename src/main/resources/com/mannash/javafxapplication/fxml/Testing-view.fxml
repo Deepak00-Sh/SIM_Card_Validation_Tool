@@ -171,7 +171,10 @@
                               </VBox.margin>
                                     </HBox>
                                     <HBox id="messageHbox" prefHeight="52.0" prefWidth="387.0">
-                                        <Label id="messageTextArea" fx:id="messageTextArea" contentDisplay="CENTER" layoutX="698.0" layoutY="15.0" prefHeight="51.0" prefWidth="376.0" visible="false" />
+                                        <Label id="messageTextArea" fx:id="messageTextArea" contentDisplay="CENTER" layoutX="698.0" layoutY="15.0" prefHeight="51.0" prefWidth="376.0" visible="false">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></Label>
                                     </HBox>
                                 </children>
                                 <VBox.margin>
@@ -214,7 +217,7 @@
    <bottom>
       <ImageView id="bottomImage" fitHeight="100.0" fitWidth="980.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
           <image>
-              <Image url="@images/footer5.png" />
+              <Image url="@images/footer7.png" />
           </image>
       </ImageView>
 

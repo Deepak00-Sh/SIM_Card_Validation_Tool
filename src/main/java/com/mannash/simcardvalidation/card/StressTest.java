@@ -225,9 +225,9 @@ public class StressTest {
 							}
 							System.out.println("List : " + this.reverseStress);
 						}
-						System.out.println("Array of string : "+arrayOfString.length);
+//						System.out.println("Array of string : "+arrayOfString.length);
 						for (int b1 = 0; b1 < arrayOfString.length; b1++) {
-							System.out.println("B = "+b1 +" J = "+j);
+//							System.out.println("B = "+b1 +" J = "+j);
 							if (arrayOfString[b1].equals("SETAID")) {
 								if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
 									return false;
