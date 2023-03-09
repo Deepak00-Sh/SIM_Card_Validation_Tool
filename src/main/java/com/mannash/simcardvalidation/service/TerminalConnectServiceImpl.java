@@ -1,21 +1,13 @@
 package com.mannash.simcardvalidation.service;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.smartcardio.Card;
-import javax.smartcardio.CardChannel;
-import javax.smartcardio.CardException;
-import javax.smartcardio.CardTerminal;
-import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
-import javax.smartcardio.TerminalFactory;
-
-//import com.mannash.trakme.client.service.LoggerService;
-//import com.mannash.trakme.client.service.LoggerServiceImpl;
-//import com.mannash.trakme.client.service.TerminalConnectService;
+import javax.smartcardio.*;
 import com.mannash.simcardvalidation.TestingController4;
 import com.mannash.simcardvalidation.pojo.TerminalInfo;
 import org.slf4j.Logger;
@@ -32,6 +24,7 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 	int counter = 0;
 	CardChannel cardChannel = null;
 	public String _terminal = "T";
+
 	public String _card = "C";
 	public String _device = "D";
 	public String _ui = "UI";
@@ -44,8 +37,10 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 	public List<TerminalInfo> fetchTerminalInfo() {
 		List<String> iccidList = new ArrayList<String>();
 		List<TerminalInfo> terminalInfos = new ArrayList<TerminalInfo>();
+	   // clearTerminal();
 		TerminalFactory terminalFactory = null;
 		try {
+
 			terminalFactory = TerminalFactory.getInstance("PC/SC", null);
 
 			// this.logger.debug("Terminal factory : " + terminalFactory);
@@ -68,9 +63,12 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 					if (cardTerminal.isCardPresent()) {
 
 						try {
+
 							Card card = cardTerminal.connect("T=0");
+							//this.card = card;
 							// this.logger.debug("Card is present : " + card);
 							cardChannel = card.getBasicChannel();
+
 							// ATR atr = card.getATR();
 
 						} catch (CardException e) {
@@ -134,6 +132,7 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
+			//clearTerminal();
 			controller.displayLogs(_terminal,"No device found");
 			// this.logger.info("Terminal is not connected.");
 		}
@@ -318,6 +317,47 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 
 	@Override
 	public String toString() {
+
 		return "TerminalConnectServiceImpl [fetchTerminalInfo()=" + fetchTerminalInfo() + "]";
+	}
+
+	private void clearTerminal(){
+		try {
+			Class pcscterminal = Class.forName("sun.security.smartcardio.PCSCTerminals");
+			Field contextId = pcscterminal.getDeclaredField("contextId");
+			contextId.setAccessible(true);
+
+			if (contextId.getLong(pcscterminal) != 0L) {
+				// First get a new context value
+				Class pcsc = Class.forName("sun.security.smartcardio.PCSC");
+				Method SCardEstablishContext = pcsc.getDeclaredMethod(
+						"SCardEstablishContext",
+						new Class[]{Integer.TYPE}
+				);
+				SCardEstablishContext.setAccessible(true);
+
+				Field SCARD_SCOPE_USER = pcsc.getDeclaredField("SCARD_SCOPE_USER");
+				SCARD_SCOPE_USER.setAccessible(true);
+
+				long newId = ((Long) SCardEstablishContext.invoke(pcsc,
+						new Object[]{SCARD_SCOPE_USER.getInt(pcsc)}
+				));
+				contextId.setLong(pcscterminal, newId);
+
+
+				// Then clear the terminals in cache
+				TerminalFactory factory = TerminalFactory.getDefault();
+				CardTerminals terminals = factory.terminals();
+				Field fieldTerminals = pcscterminal.getDeclaredField("terminals");
+				fieldTerminals.setAccessible(true);
+				Class classMap = Class.forName("java.util.Map");
+				Method clearMap = classMap.getDeclaredMethod("clear");
+
+				clearMap.invoke(fieldTerminals.get(terminals));
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
 	}
 }
