@@ -21,7 +21,7 @@
                 </ImageView>
                 <Region HBox.hgrow="ALWAYS" />
                 <Region prefHeight="55.0" prefWidth="277.0" HBox.hgrow="ALWAYS" />
-                <HBox alignment="TOP_RIGHT" style="-fx-alignment: right; ">
+                <HBox alignment="TOP_RIGHT">
                     <ImageView fitHeight="38.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
                         <image>
                             <Image url="@images/user.png" />
