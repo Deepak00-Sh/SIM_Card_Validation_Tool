@@ -24,10 +24,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import javax.smartcardio.Card;
-import javax.smartcardio.CardChannel;
-import javax.smartcardio.CardException;
+import javax.smartcardio.*;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -244,6 +244,7 @@ public class TestingController4 extends LoginFormController implements Initializ
         logTextArea.setPrefSize(simCardVbox.getPrefWidth(), simCardVbox.getPrefHeight());
         logTextArea.positionCaret(logTextArea.getLength());
         logTextArea.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+        logTextArea.setEditable(false);
         logTextArea.viewOrderProperty();
         logTextArea.getStyleClass().add("text-area-left-aligned");
         this.pane = pane;
@@ -258,13 +259,13 @@ public class TestingController4 extends LoginFormController implements Initializ
                 @Override
                 protected Boolean call() throws Exception {
                     //connect to terminal
-                    System.out.println("Inside the task 1");
+                    // System.out.println("Inside the task 1");
                     boolean b1 = initializeTerminal();
                     setCardConnected(b1);
 
                     if (isCardConnected()) {
-                        System.out.println("Card is connected ");
-                        System.out.println("Iccid : " + getTerminal().getTerminalCardIccid());
+                        // System.out.println("Card is connected ");
+                        // System.out.println("Iccid : " + getTerminal().getTerminalCardIccid());
                         setLocalIccid(getTerminal().getTerminalCardIccid());
                         setImsi(getTerminal().getImsi());
 
@@ -288,7 +289,7 @@ public class TestingController4 extends LoginFormController implements Initializ
                 protected Boolean call() throws Exception {
                     //connect to terminal
                     displayLogs(_terminal,_card,"Starting File System Verification");
-                    System.out.println("Inside the task 2");
+                    // System.out.println("Inside the task 2");
                     boolean b2 = fileSystemVerification();
                     setFileSystemVerification(b2);
                     return b2;
@@ -299,9 +300,10 @@ public class TestingController4 extends LoginFormController implements Initializ
                 @Override
                 protected Boolean call() throws Exception {
                     //connect to terminal
-                    System.out.println("Inside the task 3");
+                    // System.out.println("Inside the task 3");
                     displayLogs(_terminal,_card,"Starting Profile Verification");
                     boolean b3 = profileValidation();
+                    // System.out.println("profile test status : "+b3);
                     setProfileTesting(b3);
                     return b3;
                 }
@@ -311,7 +313,7 @@ public class TestingController4 extends LoginFormController implements Initializ
                 @Override
                 protected Boolean call() throws Exception {
                     //connect to terminal
-                    System.out.println("Inside the task 4");
+                    // System.out.println("Inside the task 4");
                     displayLogs(_terminal,_card,"Starting Read/Write Test");
                     boolean b4 = readWriteTest();
 
@@ -324,7 +326,7 @@ public class TestingController4 extends LoginFormController implements Initializ
                 @Override
                 protected Boolean call() throws Exception {
                     //connect to terminal
-                    System.out.println("Inside the task 5");
+                    // System.out.println("Inside the task 5");
                     boolean b5 = resultCompilation();
                     setResultCompilation(b5);
                     return b5;
@@ -522,20 +524,23 @@ public class TestingController4 extends LoginFormController implements Initializ
 
     public void onButtonPress() throws IOException, CardException {
         if(img_test_button.getImage().getUrl().contains("button_Start_Testing")){
-            System.out.println("inside the startTest..................");
+            // System.out.println("inside the startTest..................");
             displayLogs(_terminal,"Verification started");
             onStartButtonPress();
         } else if (img_test_button.getImage().getUrl().contains("button_cancel.png")) {
             displayLogs(_terminal,"Verification process cancelled");
-            System.out.println("inside the cancel ........................");
+            // System.out.println("inside the cancel ........................");
             cancelAllThreads();
+//            clearTerminal();
             loadTestingWindow();
         } else if (img_test_button.getImage().getUrl().contains("button_OK")) {
-            System.out.println("inside the done.............................");
+            // System.out.println("inside the done.............................");
+//            clearTerminal();
             loadTestingWindow();
         }
         else if (img_test_button.getImage().getUrl().contains("button_faulty")) {
-            System.out.println("inside the done.............................");
+            // System.out.println("inside the done.............................");
+//            clearTerminal();
             loadTestingWindow();
         }
     }
@@ -574,7 +579,7 @@ public class TestingController4 extends LoginFormController implements Initializ
 
 
     public void cancelAllThreads() {
-        System.out.println(this.threadList);
+        // System.out.println(this.threadList);
         for (Thread thread : this.threadList) {
             thread.stop();
         }
@@ -583,19 +588,24 @@ public class TestingController4 extends LoginFormController implements Initializ
     private boolean initializeTerminal() throws CardException {
         displayLogs(_terminal,_card,"Calling fetchterminal");
         TerminalConnectService terminalConnectService = new TerminalConnectServiceImpl(this);
-        List<TerminalInfo> terminalInfos = terminalConnectService.fetchTerminalInfo();
-        if(terminalInfos.size()==0) {
+        try {
+            List<TerminalInfo> terminalInfos = terminalConnectService.fetchTerminalInfo();
+            if(terminalInfos.size()==0) {
 //            displayLogs(_terminal,_card,"No card found");
-            return false;
-        }else {
-            TerminalInfo terminal1 = terminalInfos.get(0);
-            setTerminal(terminal1);
+                return false;
+            }else {
+                TerminalInfo terminal1 = terminalInfos.get(0);
+                setTerminal(terminal1);
 
 //            this.woId = "1184";
-            int terminalId1 = terminal.getTerminalNumber();
-            setTerminalId(terminalId1);
-            return true;
+                int terminalId1 = terminal.getTerminalNumber();
+                setTerminalId(terminalId1);
+                return true;
+            }
+        }catch (Exception e){
+            // System.out.println("Testing controller exception");
         }
+
 
 //				List<ResponseFieldTestingCardPojo> fieldTestingCardPojos = serverResponse
 //						.getResponseFieldTestingCardPojos();
@@ -603,13 +613,13 @@ public class TestingController4 extends LoginFormController implements Initializ
 //        Iterator<TerminalInfo> terminalInfo = terminalInfos.iterator();
 
 //        while (terminalInfo.hasNext()) {
-//            System.out.println("Terminal iterator inside the sub-while loop...");
+//            // System.out.println("Terminal iterator inside the sub-while loop...");
 //            this.terminal = terminalInfo.next();
 //            terminal.setUserName("");
 //            String localIccid = terminal.getTerminalCardIccid();
 //            int terminalId = terminal.getTerminalNumber();
 //            terminal.setWoId("1184");
-//            System.out.println("localIccid : "+localIccid);
+//            // System.out.println("localIccid : "+localIccid);
 //            card = terminal.getCt().connect("T=0");
 //
 //            loggerService = new LoggerServiceImpl();
@@ -620,6 +630,7 @@ public class TestingController4 extends LoginFormController implements Initializ
 //
 //        }
 
+        return false;
     }
 
     private boolean fileSystemVerification() {
@@ -629,8 +640,8 @@ public class TestingController4 extends LoginFormController implements Initializ
     }
     private boolean profileValidation() {
         ProfileTest3G profileTest3G = new ProfileTest3G("0000000000000000", getTerminal(), getCard(), this.loggerService,this);
-        boolean runProfile = profileTest3G.runProfileTesting();
-        return runProfile;
+//        boolean runProfile = profileTest3G.runProfileTesting();
+        return profileTest3G.runProfileTesting();
     }
 
     public boolean readWriteTest() {
@@ -643,5 +654,45 @@ public class TestingController4 extends LoginFormController implements Initializ
 
     public boolean resultCompilation() {
         return true;
+    }
+
+    private void clearTerminal(){
+        try {
+            Class pcscterminal = Class.forName("sun.security.smartcardio.PCSCTerminals");
+            Field contextId = pcscterminal.getDeclaredField("contextId");
+            contextId.setAccessible(true);
+
+            if (contextId.getLong(pcscterminal) != 0L) {
+                // First get a new context value
+                Class pcsc = Class.forName("sun.security.smartcardio.PCSC");
+                Method SCardEstablishContext = pcsc.getDeclaredMethod(
+                        "SCardEstablishContext",
+                        new Class[]{Integer.TYPE}
+                );
+                SCardEstablishContext.setAccessible(true);
+
+                Field SCARD_SCOPE_USER = pcsc.getDeclaredField("SCARD_SCOPE_USER");
+                SCARD_SCOPE_USER.setAccessible(true);
+
+                long newId = ((Long) SCardEstablishContext.invoke(pcsc,
+                        new Object[]{SCARD_SCOPE_USER.getInt(pcsc)}
+                ));
+                contextId.setLong(pcscterminal, newId);
+
+
+                // Then clear the terminals in cache
+                TerminalFactory factory = TerminalFactory.getDefault();
+                CardTerminals terminals = factory.terminals();
+                Field fieldTerminals = pcscterminal.getDeclaredField("terminals");
+                fieldTerminals.setAccessible(true);
+                Class classMap = Class.forName("java.util.Map");
+                Method clearMap = classMap.getDeclaredMethod("clear");
+
+                clearMap.invoke(fieldTerminals.get(terminals));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

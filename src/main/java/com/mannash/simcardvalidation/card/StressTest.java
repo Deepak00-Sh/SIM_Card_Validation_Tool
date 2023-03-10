@@ -81,7 +81,7 @@ public class StressTest {
 			this.properties = new Properties();
 
 			if (input == null) {
-				// //TODO System.out.println("Sorry, unable to find config.properties");
+				// //TODO // System.out.println("Sorry, unable to find config.properties");
 				return;
 			}
 			this.properties.load(input);
@@ -139,17 +139,17 @@ public class StressTest {
 						e.printStackTrace();
 					}
 
-					System.out.println("index of sms : " + indexOfSms);
+					// System.out.println("index of sms : " + indexOfSms);
 					String date;
 					String time;
 					String stressTimeStamp;
 					String updatedSmsContent;
 					for (double j = 1; j <= this.loopCount; j++) {
-						System.out.println("Loop counts : " + j);
+						// System.out.println("Loop counts : " + j);
 						controller.displayLogs(_terminal,_card,"Read/Write cycle : " + (int)j);
 
-//						System.out.println("Stress loop counts : "+j);
-//						//TODO System.out.println("Stress loop count : " + (int) Math. round(j));
+//						// System.out.println("Stress loop counts : "+j);
+//						//TODO // System.out.println("Stress loop count : " + (int) Math. round(j));
 						if (!this.run)
 							break;
 
@@ -186,7 +186,7 @@ public class StressTest {
 
 							for (int i = 0; i < this.reverseStress.size(); i++) {
 								try {
-									System.out.println(this.reverseStress.get(i));
+									// System.out.println(this.reverseStress.get(i));
 									if (!this.reverseStress.get(i).substring(2, 4).equals("D6")) {
 										if (this.reverseStress.get(i).equals("SETAID")) {
 											if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
@@ -223,18 +223,18 @@ public class StressTest {
 								this.logger.debug(e.toString(), this.ICCID, this.woId);
 								this.loggerService.log(e.toString(), this.ICCID, this.woId, LogType.ERROR);
 							}
-							System.out.println("List : " + this.reverseStress);
+							// System.out.println("List : " + this.reverseStress);
 						}
-//						System.out.println("Array of string : "+arrayOfString.length);
+//						// System.out.println("Array of string : "+arrayOfString.length);
 						for (int b1 = 0; b1 < arrayOfString.length; b1++) {
-//							System.out.println("B = "+b1 +" J = "+j);
+//							// System.out.println("B = "+b1 +" J = "+j);
 							if (arrayOfString[b1].equals("SETAID")) {
 								if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
 									return false;
 								}
 								continue;
 							} else if (arrayOfString[b1].equals("RESET")) {
-								System.out.println("calling reset");
+								// System.out.println("calling reset");
 								controller.displayLogs(_terminal, _card,"Calling reset");
 								try {
 									if (!resetChannel()) {
@@ -247,7 +247,7 @@ public class StressTest {
 							}
 
 							if (!sendRawApduNoPrint(arrayOfString[b1])) {
-								System.out.println("false 1");
+								// System.out.println("false 1");
 								return false;
 							}
 
@@ -447,7 +447,7 @@ public class StressTest {
 						arrayOfString[b++] = apdus.next();
 					}
 					for (double j = 1; j <= 5; j++) {
-						System.out.println("Reverse Stress loop counts : " + j);
+						// System.out.println("Reverse Stress loop counts : " + j);
 						if (!this.run)
 							break;
 						log("TERMINAL " + this.terminalNumber + " ## " + this.ICCID
@@ -465,7 +465,7 @@ public class StressTest {
 								}
 								continue;
 							} else if (arrayOfString[b1].equals("RESET")) {
-								System.out.println("calling reset");
+								// System.out.println("calling reset");
 								controller.displayLogs(_terminal, _card,"Calling reset");
 								try {
 									if (!resetChannel()) {
@@ -676,7 +676,7 @@ public class StressTest {
 							try {
 								responseAPDU = this.cardChannel.transmit(commandAPDU);
 							} catch (Exception e) {
-//								System.out.println("e5");
+//								// System.out.println("e5");
 //								 e.printStackTrace();
 
 //								tryToReconnect(commandAPDU);
@@ -691,8 +691,9 @@ public class StressTest {
 								}
 
 								if (!reset) {
-									System.out.println("Disconnecting card...");
+									// System.out.println("Disconnecting card...");
 									this.card.disconnect(false);
+									controller.displayLogs(_terminal, "Card disconnected, please connect again.");
 									return false;
 								}
 							}
@@ -912,7 +913,7 @@ public class StressTest {
 //					+ formatN("" + calendar.get(13), 2);
 //			String str4 = getdate(1);
 //			String str5 = str4.substring(0, 6);
-////			System.out.println("str5 : "+str5);
+////			// System.out.println("str5 : "+str5);
 //
 ////			File file = new File(this.properties.getProperty("stressLogPath"));
 //			File file2 = new File(this.localStressLogPath + logFileName + str2 + ".txt");
@@ -992,6 +993,7 @@ public class StressTest {
 //			createLogFolders();
 
 		} catch (Exception e) {
+			// System.out.println("inside the init function");
 			e.printStackTrace();
 		}
 	}
@@ -1054,7 +1056,7 @@ public class StressTest {
 	}
 
 	public boolean resetChannel() {
-//		System.out.println("Calling reset channel ...");
+//		// System.out.println("Calling reset channel ...");
 //		try {
 //			this.cardChannel.close();
 //		} catch (Exception e1) {

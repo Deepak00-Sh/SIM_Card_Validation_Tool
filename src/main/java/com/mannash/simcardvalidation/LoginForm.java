@@ -14,6 +14,7 @@ import javafx.util.Duration;
 public class LoginForm extends Application {
     @Override
     public void start(Stage stage) throws Exception {
+        Image icon = new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png");
         FXMLLoader splashLoader = new FXMLLoader(getClass().getResource("/com/mannash/javafxapplication/fxml/splash-screen.fxml"));
         Parent splashRoot = splashLoader.load();
         Scene splashScene = new Scene(splashRoot);
@@ -21,6 +22,7 @@ public class LoginForm extends Application {
         Parent loginRoot = loginLoader.load();
         Scene loginScene = new Scene(loginRoot);
         stage.initStyle(StageStyle.UNDECORATED);
+        stage.getIcons().add(icon);
         stage.setScene(splashScene);
 
         stage.show();
@@ -29,7 +31,7 @@ public class LoginForm extends Application {
             stage.close();
             Stage loginStage = new Stage();
 
-            Image icon = new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png");
+
             loginStage.getIcons().add(icon);
             loginStage.setScene(loginScene);
             loginStage.setResizable(false);

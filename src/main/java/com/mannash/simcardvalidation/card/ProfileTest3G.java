@@ -62,7 +62,7 @@ public class ProfileTest3G {
 			this.properties = new Properties();
 
 			if (input == null) {
-//				System.out.println("Sorry, unable to find config.properties"); 
+//				// System.out.println("Sorry, unable to find config.properties"); 
 				return;
 			}
 			this.properties.load(input);
@@ -88,6 +88,7 @@ public class ProfileTest3G {
 				return false;
 			}
 			if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+				// System.out.println("1");
 				return false;
 			}
 
@@ -129,6 +130,7 @@ public class ProfileTest3G {
 		} else {
 //			boolean srp2 = sendRawApduNoPrint("0020000A08" + this.aDM);
 			if (!sendRawApduNoPrint("0020000A08" + this.aDM)) {
+				// System.out.println("2");
 				return false;
 			}
 			if (getSW1Text().equals("90")) {
@@ -137,6 +139,7 @@ public class ProfileTest3G {
 				// this.aID = "1234";
 //				boolean srp3 = sendRawApduNoPrint("00A4040C10 " + this.aID);
 				if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+					// System.out.println("3");
 					return false;
 				}
 				this.ICCID = getICCID();
@@ -201,9 +204,11 @@ public class ProfileTest3G {
 	public String getICCID() {
 		// sendRawApduNoPrint("00A4000402 3F00");
 		if (!sendRawApduNoPrint("00A4080402 2FE2")) {
+			// System.out.println("4");
 			return null;
 		}
 		if (!sendRawApduNoPrint("00B000000A")) {
+			// System.out.println("5");
 			return null;
 		}
 		return nibbleSwap(getResponse());
@@ -212,12 +217,15 @@ public class ProfileTest3G {
 	public String getIMSI() {
 //		sendRawApduNoPrint("00A4000402 3F00");
 		if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+			// System.out.println("5");
 			return null;
 		}
 		if (!sendRawApduNoPrint("00A4090C02 6F07")) {
+			// System.out.println("6");
 			return null;
 		}
 		if (!sendRawApduNoPrint("00B0000009")) {
+			// System.out.println("7");
 			return null;
 		}
 		return nibbleSwap(getResponse());
@@ -248,13 +256,17 @@ public class ProfileTest3G {
 	public boolean sendRawApduNoPrint(String paramString) {
 		try {
 			if (!sendCmd(paramString)) {
+				// System.out.println("returning false from sendRawApduNoPrint");
 				return false;
+			}else {
+				// System.out.println("returning true from sendRawApduNoPrint");
+				return true;
 			}
 		} catch (Exception exception) {
 			// this.logger.debug("Send APDU Error : "+paramString);
 			return false;
 		}
-		return true;
+//		return true;
 	}
 
 	public boolean sendRawApdu(String paramString) {
@@ -277,10 +289,12 @@ public class ProfileTest3G {
 				String fiveg = "5FC0";
 //				boolean srp4 = sendRawApduNoPrint("00A4040C10 " + this.aID);
 				if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+					// System.out.println("8");
 					return false;
 				}
 //				boolean srp5 = sendRawApduNoPrint("00A4000402 " + fiveg);
 				if (!sendRawApduNoPrint("00A4000402 " + fiveg)) {
+					// System.out.println("8");
 					return false;
 				}
 			} else {
@@ -289,6 +303,7 @@ public class ProfileTest3G {
 				if (paramString.substring(0, 4).equals("7F01")) {
 //				boolean srp6 = sendRawApduNoPrint("00A4040C10 " + this.aID);
 					if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+						// System.out.println("10");
 						return false;
 					}
 				}
@@ -297,6 +312,7 @@ public class ProfileTest3G {
 					String str1 = paramString.substring(k, m);
 //					boolean srp7 = sendRawApduNoPrint("00A4000402" + str1);
 					if (!sendRawApduNoPrint("00A4000402" + str1)) {
+						// System.out.println("11");
 						return false;
 					}
 //					String str2 = getSW1Text() + getSW2Text();
@@ -304,6 +320,7 @@ public class ProfileTest3G {
 			}
 		} else if (paramString.equals("ADF")) {
 			if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+				// System.out.println("12");
 				return false;
 			}
 		}
@@ -315,6 +332,7 @@ public class ProfileTest3G {
 			if (paramString.equals("ADF5FC0")) {
 //				boolean srp9 = sendRawApduNoPrint("00A4040C10 " + this.aID);
 				if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+					// System.out.println("13");
 					return false;
 				}
 			} else {
@@ -325,6 +343,7 @@ public class ProfileTest3G {
 				if (paramString.substring(0, 4).equals("7F01") && paramString.substring(4, 8).equals("5F3B")) {
 //					boolean srp10 = sendRawApduNoPrint("00A4040C10 " + this.aID);
 					if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+						// System.out.println("14");
 						return false;
 					}
 				} else {
@@ -333,6 +352,7 @@ public class ProfileTest3G {
 						String str1 = paramString.substring(k, m);
 //						boolean srp11 = sendRawApduNoPrint("00A4000402" + str1);
 						if (!sendRawApduNoPrint("00A4000402" + str1)) {
+							// System.out.println("15");
 							return false;
 						}
 //						String str2 = getSW1Text() + getSW2Text();
@@ -342,6 +362,7 @@ public class ProfileTest3G {
 		} else if (paramString.equals("ADF")) {
 //			boolean srp12 = sendRawApduNoPrint("00A4040C10 " + this.aID);
 			if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+				// System.out.println("16");
 				return false;
 			}
 		}
@@ -349,12 +370,17 @@ public class ProfileTest3G {
 	}
 
 	public boolean compareFileAttributes(String[] paramArrayOfString) {
+		// System.out.println("compare file atribute");
 		try {
 			String str1 = paramArrayOfString[0];
 			String str2 = paramArrayOfString[1];
-			gotoFile(paramArrayOfString[1]);
+
+			if (!gotoFile(paramArrayOfString[1])){
+				return false;
+			}
 			controller.displayLogs(_terminal,_card,"00A4000402" + str1);
 			if (!sendRawApduNoPrint("00A4000402" + str1)) {
+				// System.out.println("17");
 				controller.displayLogs(_card,_terminal,getSW1Text()+getSW2Text());
 				return false;
 			}
@@ -418,6 +444,8 @@ public class ProfileTest3G {
 //				str5 = arrayOfString1[b4 + 4];
 				String str15 = readAMDO(str4, str5, str2);
 				if (str15.equals(str4)) {
+				} else if (str15.equalsIgnoreCase("-1")) {
+					return false;
 				} else {
 					str12 = getAccessRight(str15);
 					i1 = str12.indexOf(",", 0);
@@ -532,10 +560,23 @@ public class ProfileTest3G {
 
 		// this.logger.debug("readAMDO parmstr1" + paramString1 + " parmStr2 " +
 		// paramString2 + " parmStr3" + paramString3);
-		gotoAMDO(paramString3);
-		if (paramString1.equals("2F06"))
-			sendRawApduNoPrint("00A4000402 3F00");
-		sendRawApduNoPrint("00A4000402 " + paramString1);
+		if (!gotoAMDO(paramString3)){
+			return "-1";
+		}
+
+
+		if (paramString1.equals("2F06")){
+			if (!sendRawApduNoPrint("00A4000402 3F00")){
+				// System.out.println("18");
+				return "-1";
+			}
+		}
+
+		if (!sendRawApduNoPrint("00A4000402 " + paramString1)){
+			// System.out.println("19");
+			return "-1";
+		}
+
 		if (getSW1Text().equals("90")) {
 			String str1 = insertSpace(getResponse());
 			// this.logger.debug("readAMDo str1 : " + str1);
@@ -559,7 +600,11 @@ public class ProfileTest3G {
 			if (str3.length() == 1) {
 				str3 = "0" + str3;
 			}
-			sendRawApduNoPrint("00B2 " + str3 + "04" + str2);
+			if(!sendRawApduNoPrint("00B2 " + str3 + "04" + str2)){
+				// System.out.println("20");
+				return "-1";
+			}
+
 			return getResponse();
 		}
 		// this.logger.debug("\t AMDO file not found !!" + paramString1);
@@ -680,6 +725,7 @@ public class ProfileTest3G {
 	}
 
 	public boolean sendCmd(String paramString) {
+		// System.out.println("from sendCmd");
 
 		paramString = paramString.toUpperCase();
 		paramString = paramString.replaceAll(" ", "");
@@ -752,7 +798,9 @@ public class ProfileTest3G {
 								}
 
 								if (!reset) {
+									// System.out.println("Disconnecting card for profile...");
 									this.card.disconnect(false);
+									controller.displayLogs(_terminal, "Card disconnected, please connect again.");
 									return false;
 								}
 
@@ -771,7 +819,7 @@ public class ProfileTest3G {
 							this._SW = Integer.toHexString(responseAPDU.getSW());
 							this._SW1 = (byte) responseAPDU.getSW1();
 							this._SW2 = (byte) responseAPDU.getSW2();
-							System.out.println("APDU : "+ paramString+"Response :"+this._SW);
+							// System.out.println("APDU : "+ paramString+"Response :"+this._SW);
 //							controller.displayLogs(_card,_terminal, this._SW);
 						} catch (Exception exception) {
 							exception.printStackTrace();
@@ -838,6 +886,7 @@ public class ProfileTest3G {
 
 	@SuppressWarnings("unlikely-arg-type")
 	public boolean readConfig() {
+		// System.out.println("from readConfig");
 		try {
 
 			Iterator<String> filesystemConfigs = this.fileSystemConfig.iterator();
@@ -937,7 +986,7 @@ public class ProfileTest3G {
 		sendRawApduNoPrint("00A4000C027F10");
 		sendRawApduNoPrint("00A4000C026F3C");
 		sendRawApduNoPrint(updatedContent);
-		System.out.println(updatedContent + getSW1Text() + getSW2Text());
+		// System.out.println(updatedContent + getSW1Text() + getSW2Text());
 	}
 
 
@@ -1022,12 +1071,14 @@ public class ProfileTest3G {
 		// sendRawApduNoPrint("A0A4000002 3F00");
 
 		if (!sendRawApduNoPrint("00A4080402 2F00")) {
+			// System.out.println("21");
 			return null;
 		}
 		str1 = insertSpace(getResponse());
 		// this.logger.debug("Str1 after 2F00 :-" + str1);
 		str2 = fetchRecordSize(str1);
 		if (!sendRawApduNoPrint("00B20104" + str2)) {
+			// System.out.println("22");
 			return null;
 		}
 		str1 = getResponse();
@@ -1042,6 +1093,7 @@ public class ProfileTest3G {
 	public boolean setADM() {
 //		boolean srp20 = sendRawApduNoPrint("A020000A08 " + this.admKEY);
 		if (!sendRawApduNoPrint("A020000A08 " + this.admKEY)) {
+			// System.out.println("23");
 			return false;
 		}
 		return true;
@@ -1277,20 +1329,20 @@ public class ProfileTest3G {
 		}
 		String jsonString = stringBuilder.toString();
 
-		System.out.println("jsonString : "+jsonString);
+		// System.out.println("jsonString : "+jsonString);
 
 		Gson gson = new Gson();
 		ResponseProfileTestingConfig serverResponse = gson.fromJson(jsonString, ResponseProfileTestingConfig.class);
 
-		System.out.println("ServerResponse : "+serverResponse.toString());
-		System.out.println("fileSystemConfig : "+serverResponse.getFileSystemConfig());
+		// System.out.println("ServerResponse : "+serverResponse.toString());
+		// System.out.println("fileSystemConfig : "+serverResponse.getFileSystemConfig());
 
 
 		this.fileSystemConfig = serverResponse.getFileSystemConfig();
-		System.out.println(this.fileSystemConfig);
+		// System.out.println(this.fileSystemConfig);
 
 		this.fileContentConfig = serverResponse.getFileContentConfig();
-		System.out.println(this.fileContentConfig);
+		// System.out.println(this.fileContentConfig);
 		// this.logger.debug("fileSystemConfig" + this.fileSystemConfig);
 	}
 

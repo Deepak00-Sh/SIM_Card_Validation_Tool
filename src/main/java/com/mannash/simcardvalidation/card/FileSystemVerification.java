@@ -49,7 +49,7 @@ public class FileSystemVerification {
 			this.properties = new Properties();
 
 			if (input == null) {
-//				System.out.println("Sorry, unable to find config.properties"); 
+//				// System.out.println("Sorry, unable to find config.properties"); 
 				return;
 			}
 			this.properties.load(input);
@@ -339,7 +339,10 @@ public class FileSystemVerification {
 		try {
 			String str1 = paramArrayOfString[0];
 			String str2 = paramArrayOfString[1];
-			gotoFile(paramArrayOfString[1]);
+
+			if (!gotoFile(paramArrayOfString[1])){
+				return false;
+			}
 			controller.displayLogs(_terminal,_card,"00A4000402" + str1);
 
 			if (!sendRawApduNoPrint("00A4000402" + str1)) {
@@ -582,6 +585,8 @@ public class FileSystemVerification {
 
 								if (!reset) {
 									this.card.disconnect(false);
+									// System.out.println("disconnecting card");
+									controller.displayLogs(_terminal,"Card disconnected, please connect again.");
 									return false;
 								}
 
@@ -600,7 +605,7 @@ public class FileSystemVerification {
 							this._SW = Integer.toHexString(responseAPDU.getSW());
 							this._SW1 = (byte) responseAPDU.getSW1();
 							this._SW2 = (byte) responseAPDU.getSW2();
-							System.out.println("APDU : "+ paramString+"Response :"+this._SW);
+							// System.out.println("APDU : "+ paramString+"Response :"+this._SW);
 							controller.displayLogs(_card,_terminal, this._SW);
 						} catch (Exception exception) {
 							exception.printStackTrace();
@@ -770,13 +775,16 @@ public class FileSystemVerification {
 		sendRawApduNoPrint("00A4000C027F10");
 		sendRawApduNoPrint("00A4000C026F3C");
 		sendRawApduNoPrint(updatedContent);
-		System.out.println(updatedContent + getSW1Text() + getSW2Text());
+		// System.out.println(updatedContent + getSW1Text() + getSW2Text());
 	}
 
 	public boolean compareFileContent(String[] paramArrayOfString) {
 		try {
 			String str = paramArrayOfString[0];
-			gotoFile(paramArrayOfString[1]);
+
+			if (!gotoFile(paramArrayOfString[1])){
+				return false;
+			}
 			if (!sendRawApduNoPrint("00A4000402" + str)) {
 				controller.displayLogs(_terminal,_card,"00A4000402" + str);
 				return false;
@@ -880,7 +888,10 @@ public class FileSystemVerification {
 					if (str17.length() == 1)
 						str17 = "0" + str17;
 					str16 = paramArrayOfString[6];
-					gotoFile(paramArrayOfString[1]);
+
+					if (!gotoFile(paramArrayOfString[1])){
+						return false;
+					}
 					if (!sendRawApduNoPrint("00A4000402" + str)) {
 						return false;
 					}
@@ -935,7 +946,10 @@ public class FileSystemVerification {
 						if (str18.length() == 1)
 							str18 = "0" + str18;
 						str16 = paramArrayOfString[6];
-						gotoFile(paramArrayOfString[1]);
+
+						if (!gotoFile(paramArrayOfString[1])){
+							return false;
+						}
 						if (!sendRawApduNoPrint("00A4000402" + str)) {
 							return false;
 						}
@@ -977,7 +991,10 @@ public class FileSystemVerification {
 					if (str18.length() == 1)
 						str18 = "0" + str18;
 					str16 = paramArrayOfString[6];
-					gotoFile(paramArrayOfString[1]);
+
+					if (!gotoFile(paramArrayOfString[1])){
+						return false;
+					}
 					if (!sendRawApduNoPrint("00A4000402" + str)) {
 						return false;
 					}
@@ -1373,20 +1390,20 @@ public class FileSystemVerification {
 		}
 		String jsonString = stringBuilder.toString();
 
-		System.out.println("jsonString : "+jsonString);
+		// System.out.println("jsonString : "+jsonString);
 
 		Gson gson = new Gson();
 		ResponseProfileTestingConfig serverResponse = gson.fromJson(jsonString, ResponseProfileTestingConfig.class);
 
-		System.out.println("ServerResponse : "+serverResponse.toString());
-		System.out.println("fileSystemConfig : "+serverResponse.getFileSystemConfig());
+		// System.out.println("ServerResponse : "+serverResponse.toString());
+		// System.out.println("fileSystemConfig : "+serverResponse.getFileSystemConfig());
 
 
 		this.fileSystemConfig = serverResponse.getFileVerificationSystemConfig();
-		System.out.println(this.fileSystemConfig);
+		// System.out.println(this.fileSystemConfig);
 
 		this.fileContentConfig = serverResponse.getFileVerificationContentConfig();
-		System.out.println(this.fileContentConfig);
+		// System.out.println(this.fileContentConfig);
 		// this.logger.debug("fileSystemConfig" + this.fileSystemConfig);
 	}
 
