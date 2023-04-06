@@ -73,6 +73,7 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 						} catch (CardException e) {
 //							e.printStackTrace();
 							// this.logger.debug("Card connection is failed");
+							controller.deadCardAlert();
 						}
 
 						this.logger.info("Card is present on : " + cardTerminal.getName());
@@ -115,6 +116,7 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 					} else {
 						this.logger.info("Terminal: " + cardTerminal.getName() + " Card Not Present");
 						controller.displayLogs(_terminal,"Card is not present");
+						controller.deadCardAlert();
 					}
 
 				} catch (CardException cardException) {

@@ -251,7 +251,11 @@ public class StressTest {
 								return false;
 							}
 
-							if (!getSW1Text().equalsIgnoreCase("90") && !getSW1Text().equalsIgnoreCase("9F")){
+//							if (!getSW1Text().equalsIgnoreCase("90") && !getSW1Text().equalsIgnoreCase("9F")){
+//								return false;
+//							}
+
+							if (!getSW1Text().equalsIgnoreCase("90") && !getSW1Text().equalsIgnoreCase("9F") && !getSW1Text().equalsIgnoreCase("94")){
 								return false;
 							}
 
