@@ -66,6 +66,9 @@ public class LoginFormController {
         String hardCodeUserId = "store_user@mannash.com";
         String hardCodePassword = "12345";
 
+//        String encodedUserid =  org.apache.commons.codec.digest.DigestUtils.sha256Hex(userId);
+//        String encodedPwd =  org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
+
         LoginFormController.loggedInUserName = userId;
 
         ResponseAuthenticationPojo responseAuthenticationPojo = trakmeServerCommunicationService.authenticateClient(userId, password);
@@ -76,8 +79,6 @@ public class LoginFormController {
         } else {
 
             loadTestingWindowData();
-
-
 
             startTransferDataThread(LoginFormController.loggedInUserName);
 

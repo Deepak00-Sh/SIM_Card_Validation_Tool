@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import java.net.Authenticator;import java.net.PasswordAuthentication;
+
 public class LoginForm extends Application {
     public static String getVersion(){
         InputStream inputStream = LoginForm.class.getClassLoader().getResourceAsStream("application.properties");
@@ -73,12 +75,27 @@ public class LoginForm extends Application {
         }));
 
         CheckUpdate checkUpdate = new CheckUpdate();
+//        final String authUser = "A13JLHLE";
+//        final String authPassword = "1#Wahkqu";
+//
+//        System.setProperty("http.proxyHost", "airtelproxy.airtel.com");
+//        System.setProperty("http.proxyPort", "4145");
+//        System.setProperty("http.proxyUser", authUser);
+//        System.setProperty("http.proxyPassword", authPassword);
+//
+//        Authenticator.setDefault(new Authenticator() {
+//        public PasswordAuthentication getPasswordAuthentication() {
+//        return new PasswordAuthentication(authUser, authPassword.toCharArray());
+//            }
+//        }
+//);
         try {
+            String version = checkUpdate.getLatestVersion();
             System.out.println("Get current version : "+checkUpdate.getCurrentVersion());
-            System.out.println("Get new version : "+checkUpdate.getLatestVersion());
+            System.out.println("Get new version : "+version);
 
             if (!checkUpdate.getCurrentVersion().equals(checkUpdate.getLatestVersion())) {
-                System.out.println("Updated ");
+                System.out.println("Downloading the new version ...");
                 System.out.println("Current version : " + checkUpdate.getCurrentVersion());
                 System.out.println("New Version : " + checkUpdate.getLatestVersion());
 //                    checkUpdate.downloadUpdatedJarFileOnStart();
@@ -87,6 +104,7 @@ public class LoginForm extends Application {
 
         }catch (Exception e){
             System.out.println("Unable to fetch version from the server , so skipping update on start!!");
+            e.printStackTrace();
         }
 
         timeline.play();

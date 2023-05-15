@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import javax.smartcardio.*;
 
@@ -52,8 +53,12 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 
 		List<CardTerminal> list = null;
 		try {
-			list = terminalFactory.terminals().list();
-			if (list == null){
+//			list = terminalFactory.terminals().list();
+			list = terminalFactory.terminals().list().stream()
+					.filter(terminal -> terminal.getName().contains("Generic Smart Card Reader"))
+					.collect(Collectors.toList());
+
+			if (list == null || list.size() == 0){
 				controller.displayLogs(_terminal,"No device found");
 			}else {
 				controller.displayLogs(_terminal,"Device connected");

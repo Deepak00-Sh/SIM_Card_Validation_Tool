@@ -41,8 +41,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class TestingController4 extends LoginFormController implements Initializable {
@@ -213,6 +213,7 @@ public class TestingController4 extends LoginFormController implements Initializ
     private boolean cardConnected = false;
     private boolean resultCompilation = false;
     private boolean testingRunning = false;
+    private boolean isDeviceConnected = true;
     private LoggerService loggerService;
     private String imsi;
     public String _terminal = "T";
@@ -255,6 +256,7 @@ public class TestingController4 extends LoginFormController implements Initializ
     public void onStartButtonPress() {
         ExportTestingResultPojo testingResultPojo = new ExportTestingResultPojo();
         cardTestingPojosList.clear();
+        isDeviceConnected = true;
         img_test_button.setImage(cancelButtonImage);
         simCardVbox.getChildren().remove(img_status);
         //Add Logs area
@@ -382,7 +384,9 @@ public class TestingController4 extends LoginFormController implements Initializ
                     radioOptionsVBox.setVisible(true);
                     messageTextArea.setVisible(true);
                     messageTextArea.setTextFill(Color.RED);
-                    messageTextArea.setText("Card is faulty, please go for SIM swap");
+                    if (isDeviceConnected) {
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
+                    }
                 }
 
             });
@@ -743,19 +747,19 @@ public class TestingController4 extends LoginFormController implements Initializ
     private void sendResultToServer() {
         TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
         RequestSimVerificationCardPojos cardPojos = new RequestSimVerificationCardPojos();
-        System.out.println("Size of pojo list : "+cardTestingPojosList.size());
+        System.out.println("Size of pojo list : " + cardTestingPojosList.size());
 //        if (!cardTestingPojosList.get(0).getTerminalICCID().equals(null)) {
-            cardPojos.setRequestSimVerificationCardPojos(cardTestingPojosList);
-            int statusCode = 0;
-            try {
-                statusCode = service.sendReportsToServer(cardPojos);
-            } catch (Exception e) {
-                System.out.println("Reports are failed to send to server");
-            }
+        cardPojos.setRequestSimVerificationCardPojos(cardTestingPojosList);
+        int statusCode = 0;
+        try {
+            statusCode = service.sendReportsToServer(cardPojos);
+        } catch (Exception e) {
+            System.out.println("Reports are failed to send to server");
+        }
 
-            if (statusCode != 200) {
-                serializeCacheToDisk();
-            }
+        if (statusCode != 200) {
+            serializeCacheToDisk();
+        }
 //        }
     }
 
@@ -824,6 +828,12 @@ public class TestingController4 extends LoginFormController implements Initializ
         Scene scene = new Scene(testingPage);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                System.exit(0);
+            }
+        });
         primaryStage.show();
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -834,7 +844,6 @@ public class TestingController4 extends LoginFormController implements Initializ
     }
 
     public void deadCardAlert() {
-
         ExportTestingResultPojo testingResultPojo = new ExportTestingResultPojo();
         testingResultPojo.setProfileTesting("NOT OK");
         testingResultPojo.setSimHeartbeat("NOT OK");
@@ -869,6 +878,13 @@ public class TestingController4 extends LoginFormController implements Initializ
 
             // Create a textField
             TextField textField = new TextField();
+            TextFormatter<String> textFormatter = new TextFormatter<>(change -> { if (change.getControlNewText().length() <= 20) {
+                return change;
+            } else {
+                return null;
+            } });
+            textField.setTextFormatter(textFormatter);
+
 // textField.setStyle("-fx-background-color: inherit;");
             textField.setPrefWidth(174);
             // Create an HBox to hold the label and textField
@@ -876,7 +892,7 @@ public class TestingController4 extends LoginFormController implements Initializ
             hbox.setSpacing(15);
 
 
-            Insets insets = new Insets(10, 0, 0, 0);
+            Insets insets = new Insets(4, 0, 0, 0);
             GridPane.setMargin(hbox, insets);
 
 
@@ -886,7 +902,7 @@ public class TestingController4 extends LoginFormController implements Initializ
             grid.setVgap(10);
             grid.setPadding(new Insets(20, 70, 10, 10));
             grid.add(new Label(alert.getContentText()), 0, 0);
-            grid.add(hbox, 0, 1);
+            grid.add(hbox, 0, 2);
 
 
             // Set the content of the dialog pane to the grid pane
@@ -895,6 +911,13 @@ public class TestingController4 extends LoginFormController implements Initializ
 
             ButtonType sendButton = new ButtonType("Send");
             ButtonType cancelButton = new ButtonType("Cancel");
+
+            Label errorLabel = new Label();
+            errorLabel.setStyle("-fx-text-fill: red;");
+            errorLabel.setPrefWidth(300);
+            grid.add(errorLabel, 0, 1);
+            errorLabel.setPadding(new Insets(0, 0, 0, 64));
+
 
 //            ButtonType sendButton = new ButtonType("Send" , ButtonBar.ButtonData.OK_DONE);
 //            ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -914,26 +937,110 @@ public class TestingController4 extends LoginFormController implements Initializ
             // Set focus to the textField when the alert is shown
             alert.setOnShown(event -> textField.requestFocus());
             alert.setOnCloseRequest(event -> {// Perform some action before the dialog is closed
-                alert.close();
+//                alert.close();
+//                if (alert.getResult() == cancelButton) {
+//                    alert.close();
+//                } else if (alert.getResult() == sendButton) {
+//                    if (!textField.getText().isEmpty() && textField.getText().length() >= 18) {
+//                        alert.close();
+//                    } else {
+//                        event.consume();
+//                    }
+//                }else {
+//                    event.consume();
+//                }
             });
-//            sendButton.setOnAction(event -> { deadCardAlert();});
 
+            alert.setOnCloseRequest(e -> {
+            if (alert.getResult() == sendButton){
+                System.out.println("inside the get result");
+//            alert.getDialogPane().lookupButton(sendButton).setOnMouseClicked(e -> {
 
-//            alert.showAndWait();
-
-
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == sendButton) {
+                System.out.println("Clicked on the send button");
+                AtomicReference<Boolean> validateString = new AtomicReference<>(true);
+//                Optional<ButtonType> result = alert.showAndWait();
+//                if (result.get() == sendButton) {
                 System.out.println("calling function");
-                try {
-                    deadCardSendButton(testingResultPojo,textField.getText());
-                }catch (Exception e){
-                    System.out.println("Exception in deadCardSendButton");
-                    e.printStackTrace();
+                String str = textField.getText();
+//                char lastChar = str.charAt(str.length() - 1);
+//                System.out.println("Last character : " + lastChar);
+                if (str.isEmpty()) {
+                    validateString.set(false);
+                    errorLabel.setText("ICCID can not be empty");
+                    e.consume();
+                } else if (!str.startsWith("899")) {
+                    validateString.set(false);
+                    errorLabel.setText("ICCID you have entered is not valid !");
+                    e.consume();
+                } else if (str.matches(".*[^a-zA-Z0-9].*")) {
+                    validateString.set(false);
+                    errorLabel.setText("ICCID you have entered is not valid !");
+                    e.consume();
+                } else if (str.length() < 19 || str.length() > 20) {
+                    validateString.set(false);
+                    errorLabel.setText("ICCID you have entered is not valid !");
+                    e.consume();
+                } else if (!Character.isDigit(str.charAt(str.length() - 1)) && str.charAt(str.length() - 1) != 'U') {
+                    validateString.set(false);
+                    errorLabel.setText("ICCID you have entered is not valid !");
+                    e.consume();
                 }
 
-            }
+                for (int i = 0; i < str.length() - 2; i++) {
+                    char currentChar = str.charAt(i);
+                    if (Character.isLetter(currentChar)) {
+                        validateString.set(false);
+                        errorLabel.setText("ICCID you have entered is not valid !");
+                        e.consume();
+                    }
+                }
+
+                if (validateString.get()) {
+                    try {
+                        alert.close();
+                        System.out.println("calling deadCardSendButton");
+                        deadCardSendButton(testingResultPojo, textField.getText());
+                    } catch (Exception exception) {
+                        System.out.println("Exception in deadCardSendButton");
+                        exception.printStackTrace();
+                    }
+                }
+//                }
+
+
+//                if (textField.getText().isEmpty()) {
+//                    errorLabel.setText("Please enter some text.");
+////                    alert.getDialogPane().setContent(errorLabel);
+////                    alert.getDialogPane().setcon
+//                    e.consume(); // Prevent closing the alert
+//                } else {
+//                    errorLabel.setText("ICCID must contains 20 digits");
+////                    alert.getDialogPane().setContent(errorLabel);
+//                    e.consume(); // Prevent closing the alert
+//                }
+//             });
+            }else if(alert.getResult() == cancelButton){
+                alert.close();
+                }
+            });
+
+
+            alert.showAndWait();
+
+//            Optional<ButtonType> result = alert.showAndWait();
+//            if (result.get() == sendButton) {
+//                System.out.println("calling function");
+//                if (!textField.getText().isEmpty() && textField.getText().length() >= 18) {
+//                    try {
+//                        deadCardSendButton(testingResultPojo, textField.getText());
+//                    } catch (Exception e) {
+//                        System.out.println("Exception in deadCardSendButton");
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//
+//            }
 
 //            alert.showAndWait().ifPresent(button -> {
 //                if (button == sendButton) {
@@ -943,12 +1050,40 @@ public class TestingController4 extends LoginFormController implements Initializ
         });
     }
 
-    private void deadCardSendButton(ExportTestingResultPojo resultPojo, String iccid){
+    public boolean isValidString(String str, Label errorLable) {
+        // Check if the string starts with "899"
+        if (!str.startsWith("899")) {
+            errorLable.setText("ICCID not starting with 899");
+            return false;
+        }
+
+        // Check if the string has 19 or 20 digits
+        if (str.length() < 19 || str.length() > 20) {
+            return false;
+        }
+
+        // Check if the string contains any special characters
+        if (str.matches(".*[^a-zA-Z0-9].*")) {
+            return false;
+        }
+
+        // Check if the last character is a digit or 'U'
+        char lastChar = str.charAt(str.length() - 1);
+        if (!Character.isDigit(lastChar) && lastChar != 'U') {
+            return false;
+        }
+
+        // All conditions passed, the string is valid
+        return true;
+    }
+
+    private void deadCardSendButton(ExportTestingResultPojo resultPojo, String iccid) {
+        System.out.println("sending dead card detail to server");
         RequestSimVerificationCardPojos requestSimVerificationCardPojos = new RequestSimVerificationCardPojos();
         input_iccid.setText(iccid);
         resultPojo.setTerminalICCID(iccid);
         resultPojo.setTerminalIMSI(null);
-        System.out.println("Pojo from dead alert"+resultPojo.toString());
+        System.out.println("Pojo from dead alert" + resultPojo.toString());
         cardTestingPojosList.add(resultPojo);
         sendResultToServer();
         exportIcon.setVisible(true);
@@ -982,6 +1117,7 @@ public class TestingController4 extends LoginFormController implements Initializ
         try {
             List<TerminalInfo> terminalInfos = terminalConnectService.fetchTerminalInfo();
             if (terminalInfos.size() == 0) {
+                isDeviceConnected = false;
 //            displayLogs(_terminal,_card,"No card found");
                 return false;
             } else {

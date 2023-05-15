@@ -99,12 +99,12 @@ public class StressTest {
 		this.run = true;
 	}
 
-	private void updateStageCounter(String cardIccid, String woId2, int fieldTestingCardStageId, long counter) {
-		TrakmeServerCommunicationServiceImpl communicationServiceImpl = new TrakmeServerCommunicationServiceImpl();
-		communicationServiceImpl.updateCardStageCounter(woId2, cardIccid, fieldTestingCardStageId, counter,
-				this.terminalInfo.getUserName());
-
-	}
+//	private void updateStageCounter(String cardIccid, String woId2, int fieldTestingCardStageId, long counter) {
+//		TrakmeServerCommunicationServiceImpl communicationServiceImpl = new TrakmeServerCommunicationServiceImpl();
+//		communicationServiceImpl.updateCardStageCounter(woId2, cardIccid, fieldTestingCardStageId, counter,
+//				this.terminalInfo.getUserName());
+//
+//	}
 
 	public boolean startStressTest() {
 		controller.displayLogs(_terminal,_card,"Read/Write Test started");
