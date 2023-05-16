@@ -1,7 +1,5 @@
 package com.mannash.simcardvalidation;
 
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -13,11 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import java.net.Authenticator;
 import java.net.Proxy;
@@ -27,7 +21,9 @@ import java.net.HttpURLConnection;
 
 public class CheckUpdate {
 
-    private static final String VERSION_FILE_URL = "http://103.228.113.86:32100/trakmeserver/simverify/singleCard/version.txt"; // URL of version file on server
+    private static final String VERSION_FILE_URL = "http://103.228.113.86:32100/trakmeserver/simverify/singleCard/version.txt";
+    // URL of version file on server
+    private static final String USER_ACCESS_FILE = "http://103.228.113.86:32100/trakmeserver/simverify/singleCard/userAccess/admin.txt";
     private static final String JAR_FILE_URL = "http://103.228.113.86:32100/trakmeserver/simverify/singleCard/SIMCardValidationTool-1.0-SNAPSHOT.jar";
     private static final String LOCAL_FILE_PATH = "..\\lib\\SIMCardValidationTool-1.0-SNAPSHOT.jar";
     private static final String LOCAL_JAR_DOWNLOAD_PATH = "..\\updates\\SIMCardValidationTool-1.0-SNAPSHOT.jar";
@@ -297,6 +293,55 @@ public class CheckUpdate {
             e.printStackTrace();
         }
         return latestVersion;
+    }
+
+    public String checkUserAccess(String user){
+        String isUserAccessed = null;
+
+        try {
+            URL url = new URL(USER_ACCESS_FILE);
+
+//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+
+            HttpURLConnection conn = null;
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, Integer.parseInt(proxyPort)));
+            conn = (HttpURLConnection) url.openConnection();
+//            sun.net.www.protocol.http.HttpURLConnection httpConn = (sun.net.www.protocol.http.HttpURLConnection) conn;
+//            java.net.HttpURLConnection httpConn = (java.net.HttpURLConnection) conn;
+//            HttpURLConnection
+
+//            conn.setRequestProperty("Authorization", "Negotiate" + encodedUserPwd);
+
+//            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.68");
+
+
+//            httpConn.setAuthenticationProperty("Authorization", "Negotiate " + encodedUserPwd);
+
+            conn.setRequestMethod("GET");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println("line : "+line);
+                isUserAccessed = line;
+//                System.out.println(line);
+            }
+//            latestVersion = line;
+            reader.close();
+
+// Disconnect the connection
+            conn.disconnect();
+
+
+//            Scanner scanner = new Scanner(url.openStream());
+//            latestVersion = scanner.nextLine();
+//            scanner.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return isUserAccessed;
     }
 
 

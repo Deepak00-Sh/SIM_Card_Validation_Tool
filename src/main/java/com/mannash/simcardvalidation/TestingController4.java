@@ -47,8 +47,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TestingController4 extends LoginFormController implements Initializable {
 
+
     public TestingController4() {
         this.loggerService = new LoggerServiceImpl();
+        SimVerifyTransferDataToServerThread transferDataToServerThread = new SimVerifyTransferDataToServerThread(img_test_button);
     }
 
 
@@ -224,6 +226,7 @@ public class TestingController4 extends LoginFormController implements Initializ
     public static List<ExportTestingResultPojo> cardTestingPojosList = new ArrayList<ExportTestingResultPojo>();
 
     private static final String CACHE_FILE_PATH = "..\\reports\\cache\\";
+    public static final String ACK_FILE_PATH = "..\\reports\\cache\\acknowledgement\\";
     private Object csvLock = new Object();
     private boolean headersPrinted = false;
 
@@ -722,6 +725,10 @@ public class TestingController4 extends LoginFormController implements Initializ
         }
     }
 
+    public void disableStartButton(){
+        img_test_button.setDisable(true);
+    }
+
 
     private void exportButtonOperations() {
         Platform.runLater(() -> {
@@ -765,15 +772,33 @@ public class TestingController4 extends LoginFormController implements Initializ
 
     private void serializeCacheToDisk() {
         System.out.println("creating cache....");
+        String ackFileName = ACK_FILE_PATH + "cacheAcknowledgement.properties";
         File cacheDir = new File(CACHE_FILE_PATH);
         if (!cacheDir.exists()) {
             cacheDir.mkdir();
         }
+        File ackDir = new File((ACK_FILE_PATH));
+        if (!ackDir.exists()) {
+            ackDir.mkdir();
+        }
+        File ackFile = new File((ACK_FILE_PATH+ackFileName));
+        if (!ackFile.exists()) {
+            try {
+                ackFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String dateTimeString = currentDateTime.format(formatter);
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(CACHE_FILE_PATH + dateTimeString + ".ser");
+        String cacheFile = CACHE_FILE_PATH + dateTimeString + ".ser";
+
+
+        try (FileOutputStream fileOutputStream = new FileOutputStream(cacheFile);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
             objectOutputStream.writeObject(cardTestingPojosList);
             fileOutputStream.close();
@@ -782,6 +807,18 @@ public class TestingController4 extends LoginFormController implements Initializ
             System.out.println("Error serializing cache to disk.");
             e.printStackTrace();
         }
+
+        try (FileOutputStream fileOutputStream = new FileOutputStream(ackFileName);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(cacheFile+"=0\n");
+            fileOutputStream.close();
+            objectOutputStream.close();
+        } catch (IOException e) {
+            System.out.println("Error in writing ack file");
+            e.printStackTrace();
+        }
+
+
     }
 
     public void onLogOutButtonPress() {
@@ -1049,6 +1086,7 @@ public class TestingController4 extends LoginFormController implements Initializ
 //            });
         });
     }
+
 
     public boolean isValidString(String str, Label errorLable) {
         // Check if the string starts with "899"

@@ -5,12 +5,12 @@ import com.mannash.simcardvalidation.pojo.RequestSimVerificationCardPojos;
 import com.mannash.simcardvalidation.service.TrakmeServerCommunicationServiceImpl;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.scene.image.ImageView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,14 +22,20 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
 
     private String directoryPath = "..\\reports\\cache\\";
     private boolean running;
+    CheckUpdate checkUpdate = new CheckUpdate();
+    ImageView startButton;
 
     public SimVerifyTransferDataToServerThread(String loggedInUserName) {
         this.userName = loggedInUserName;
         running = true;
     }
 
+    public SimVerifyTransferDataToServerThread(ImageView imgTestButton) {
+        this.startButton = imgTestButton;
+    }
 
-    private int loadCacheFromDisk(File file){
+
+    private int loadCacheFromDisk(File file) {
         TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
         RequestSimVerificationCardPojos requestSimVerificationCardPojos = new RequestSimVerificationCardPojos();
         try {
@@ -51,7 +57,7 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
             requestSimVerificationCardPojos.setRequestSimVerificationCardPojos(data);
             try {
                 responseCode = service.sendReportsToServer(requestSimVerificationCardPojos);
-            }catch (Exception e){
+            } catch (Exception e) {
 //                System.out.println("Request of sending result failed");
             }
 
@@ -80,7 +86,7 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
 //                bufferedWriter.close();
 //            }
 //            return 200;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
@@ -90,25 +96,96 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
         running = false;
     }
 
-        private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    @Override
+    protected Task<Void> createTask() {
+        String user = this.userName;
+        ImageView tempStartButton = this.startButton;
+        return new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
                 File directory = new File(directoryPath);
                 TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
+                Properties properties = new Properties();
+                String ackFileName = TestingController4.ACK_FILE_PATH + "cacheAcknowledgement.properties";
+
                 while (running) {
+
+                    System.out.println("################################################################################");
+                    System.out.println();
+                    System.out.println("Running transfer data thread");
+                    try {
+                        FileInputStream fileInputStream = new FileInputStream(ackFileName);
+                        properties.load(fileInputStream);
+                        fileInputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Set<String> keys = properties.stringPropertyNames();
+                    String[] keyArray = keys.toArray(new String[0]);
+
+
+//                    String isUserAccessed = null;
+//                    System.out.println("data transfer thread is runnuing");
+//                    try {
+//                        isUserAccessed = checkUpdate.checkUserAccess(user);
+//                        System.out.println("isUserAccessed "+isUserAccessed);
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//
+//
+//                    if (isUserAccessed.equalsIgnoreCase("no")){
+//                        try {
+//                            TestingController4 testObj = new TestingController4();
+//                            testObj.disableStartButton();
+////                            tempStartButton.setDisable(true);
+//                        }catch (Exception e){
+//                            e.printStackTrace();
+//                        }
+
+//                    }
 //                    System.out.println("inside the while loop");
+                    System.out.println("Size of the key array : "+keyArray.length);
                     File[] files = directory.listFiles();
+                    System.out.println("Size of the files array : "+files.length);
 //                    System.out.println("Number of file present : " +files.length);
                     if (files != null && files.length > 0) {
+                        for (String key : keyArray) {
+                            System.out.println("key : "+key+" value : "+properties.getProperty(key));
+                            if (properties.getProperty(key).equals("0")) {
+                                System.out.println("Key is 0, inside the if condition");
 //                        System.out.println("Files found in directory " + directoryPath + ":");
-                        for (File file : files) {
+                                for (File file : files) {
+                                    System.out.println("inside the file for loop");
+                                    System.out.println("File : "+file.getName());
 //                            System.out.println(file.getName());
-                            int responseCode = loadCacheFromDisk(file);
-                            if (responseCode == 200){
-                                file.delete();
+                                    if (file.getName().toString().equals(key)) {
+                                        System.out.println("Key and file get matched !!");
+                                        int responseCode = loadCacheFromDisk(file);
+                                        if (responseCode == 200) {
+                                            try {
+                                                properties.setProperty(key, "1");
+                                                // Save the modified properties back to the file
+                                                OutputStream outputStream = new FileOutputStream(ackFileName);
+                                                properties.store(outputStream, null);
+                                                outputStream.close();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+
+                                            System.out.println("value of key after the updation : "+properties.getProperty(key));
+
+//                                            try {
+//                                                file.delete();
+//                                            } catch (Exception e) {
+//                                                e.printStackTrace();
+//                                            }
+
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -127,15 +204,15 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
                 }
                 return null;
             }
-            };
-        }
+        };
+    }
 
-        @Override
-        public boolean cancel() {
-            super.cancel();
-            executorService.shutdownNow();
-            return false;
-        }
+    @Override
+    public boolean cancel() {
+        super.cancel();
+        executorService.shutdownNow();
+        return false;
+    }
 
 
 }
