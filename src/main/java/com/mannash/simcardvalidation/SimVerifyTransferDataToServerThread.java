@@ -207,6 +207,62 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
         };
     }
 
+
+    //----------------------------------------------------------
+
+//    @Override
+//    protected Task<Void> createTask() {
+//        return new Task<Void>() {
+//            @Override
+//            protected Void call() throws Exception {
+//                File directory = new File(directoryPath);
+//                TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
+//                while (running) {
+//// System.out.println("inside the while loop");
+//                    File[] files = directory.listFiles();
+//// System.out.println("Number of file present : " +files.length);
+//                    if (files != null && files.length > 0) {
+//// System.out.println("Files found in directory " + directoryPath + ":");
+//                        for (File file : files) {
+//                            if (file.isDirectory()){
+//                                continue;
+//                            }
+//                            System.out.println(file.getName());
+//                            int responseCode = loadCacheFromDisk(file);
+//                            System.out.println("Sending reports response : " + responseCode);
+//                            if (responseCode == 200) {
+//                                System.out.println("Reports sends to server successfully!!");
+//                                System.out.println("Going to delete the file : " + file);
+//                                file.delete();
+//                                if (file.exists()) {
+//                                    System.out.println("File could not be deleted!!");
+//                                }
+//                            }
+//
+//
+//                        }
+//                    } else {
+//// System.out.println("No files found in directory " + directoryPath);
+//                        try {
+//                            Thread.sleep(5000);
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                    try {
+//                        Thread.sleep(5000); // wait for 5 seconds before checking again
+//                    } catch (InterruptedException e) {
+//// System.out.println("File checker thread interrupted");
+//                    }
+//                }
+//                return null;
+//            }
+//        };
+//    }
+
+
+    //-----------------------------------------------------
+
     @Override
     public boolean cancel() {
         super.cancel();

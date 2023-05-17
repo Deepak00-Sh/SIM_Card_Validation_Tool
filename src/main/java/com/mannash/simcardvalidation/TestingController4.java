@@ -759,7 +759,7 @@ public class TestingController4 extends LoginFormController implements Initializ
         cardPojos.setRequestSimVerificationCardPojos(cardTestingPojosList);
         int statusCode = 0;
         try {
-            statusCode = service.sendReportsToServer(cardPojos);
+//            statusCode = service.sendReportsToServer(cardPojos);
         } catch (Exception e) {
             System.out.println("Reports are failed to send to server");
         }
@@ -772,7 +772,7 @@ public class TestingController4 extends LoginFormController implements Initializ
 
     private void serializeCacheToDisk() {
         System.out.println("creating cache....");
-        String ackFileName = ACK_FILE_PATH + "cacheAcknowledgement.properties";
+        String ackFileName = "cacheAcknowledgement.properties";
         File cacheDir = new File(CACHE_FILE_PATH);
         if (!cacheDir.exists()) {
             cacheDir.mkdir();
@@ -797,6 +797,8 @@ public class TestingController4 extends LoginFormController implements Initializ
 
         String cacheFile = CACHE_FILE_PATH + dateTimeString + ".ser";
 
+        String cacheFileName = dateTimeString + ".ser";
+
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(cacheFile);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
@@ -808,16 +810,39 @@ public class TestingController4 extends LoginFormController implements Initializ
             e.printStackTrace();
         }
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(ackFileName);
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-            objectOutputStream.writeObject(cacheFile+"=0\n");
-            fileOutputStream.close();
-            objectOutputStream.close();
+//        try (FileOutputStream fileOutputStream = new FileOutputStream(ackFileName);
+//             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+//            objectOutputStream.writeObject(cacheFile+"=0\n");
+//            fileOutputStream.close();
+//            objectOutputStream.close();
+//        } catch (IOException e) {
+//            System.out.println("Error in writing ack file");
+//            e.printStackTrace();
+//        }
+
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(ACK_FILE_PATH+ackFileName, true));
         } catch (IOException e) {
-            System.out.println("Error in writing ack file");
+            throw new RuntimeException(e);
+        }
+
+        try  {
+            writer.write(cacheFileName+"=0");
+            writer.newLine(); // Optional: Add a new line after the appended text
+            System.out.println("Text appended successfully.");
+
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred while appending the text to the file.");
             e.printStackTrace();
         }
 
+        try {
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -872,12 +897,6 @@ public class TestingController4 extends LoginFormController implements Initializ
             }
         });
         primaryStage.show();
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                System.exit(0);
-            }
-        });
     }
 
     public void deadCardAlert() {

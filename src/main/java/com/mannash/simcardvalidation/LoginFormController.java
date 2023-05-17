@@ -112,6 +112,12 @@ public class LoginFormController {
 
 //            MenuButton logOut = (MenuButton) scene.lookup("#logOut");
 //            logOut.setText(userId);
+            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    System.exit(0);
+                }
+            });
         stage.show();
         } catch (Exception e) {
             e.printStackTrace();
