@@ -605,6 +605,7 @@ public class TestingController4 extends LoginFormController implements Initializ
             this.threadList.add(thread1);
             thread1.start();
 //        } else {
+        //alert for licence expire
 //            licenseExpired();
 //        }
 
