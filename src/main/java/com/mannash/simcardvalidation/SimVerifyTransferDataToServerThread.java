@@ -98,151 +98,98 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    @Override
-    protected Task<Void> createTask() {
-        String user = this.userName;
-        ImageView tempStartButton = this.startButton;
-        return new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                File directory = new File(directoryPath);
-                TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
-                Properties properties = new Properties();
-                String ackFileName = TestingController4.ACK_FILE_PATH + "cacheAcknowledgement.properties";
-
-                while (running) {
-
-                    System.out.println("################################################################################");
-                    System.out.println();
-                    System.out.println("Running transfer data thread");
-                    try {
-                        FileInputStream fileInputStream = new FileInputStream(ackFileName);
-                        properties.load(fileInputStream);
-                        fileInputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Set<String> keys = properties.stringPropertyNames();
-                    String[] keyArray = keys.toArray(new String[0]);
-
-
-//                    String isUserAccessed = null;
-//                    System.out.println("data transfer thread is runnuing");
-//                    try {
-//                        isUserAccessed = checkUpdate.checkUserAccess(user);
-//                        System.out.println("isUserAccessed "+isUserAccessed);
-//                    }catch (Exception e){
-//                        e.printStackTrace();
-//                    }
-//
-//
-//                    if (isUserAccessed.equalsIgnoreCase("no")){
-//                        try {
-//                            TestingController4 testObj = new TestingController4();
-//                            testObj.disableStartButton();
-////                            tempStartButton.setDisable(true);
-//                        }catch (Exception e){
-//                            e.printStackTrace();
-//                        }
-
-//                    }
-//                    System.out.println("inside the while loop");
-                    System.out.println("Size of the key array : "+keyArray.length);
-                    File[] files = directory.listFiles();
-                    System.out.println("Size of the files array : "+files.length);
-//                    System.out.println("Number of file present : " +files.length);
-                    if (files != null && files.length > 0) {
-                        for (String key : keyArray) {
-                            System.out.println("key : "+key+" value : "+properties.getProperty(key));
-                            if (properties.getProperty(key).equals("0")) {
-                                System.out.println("Key is 0, inside the if condition");
-//                        System.out.println("Files found in directory " + directoryPath + ":");
-                                for (File file : files) {
-                                    System.out.println("inside the file for loop");
-                                    System.out.println("File : "+file.getName());
-//                            System.out.println(file.getName());
-                                    if (file.getName().toString().equals(key)) {
-                                        System.out.println("Key and file get matched !!");
-                                        int responseCode = loadCacheFromDisk(file);
-                                        if (responseCode == 200) {
-                                            try {
-                                                properties.setProperty(key, "1");
-                                                // Save the modified properties back to the file
-                                                OutputStream outputStream = new FileOutputStream(ackFileName);
-                                                properties.store(outputStream, null);
-                                                outputStream.close();
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-
-                                            System.out.println("value of key after the updation : "+properties.getProperty(key));
-
-//                                            try {
-//                                                file.delete();
-//                                            } catch (Exception e) {
-//                                                e.printStackTrace();
-//                                            }
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-//                        System.out.println("No files found in directory " + directoryPath);
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    try {
-                        Thread.sleep(5000); // wait for 5 seconds before checking again
-                    } catch (InterruptedException e) {
-//                        System.out.println("File checker thread interrupted");
-                    }
-                }
-                return null;
-            }
-        };
-    }
-
-
-    //----------------------------------------------------------
-
 //    @Override
 //    protected Task<Void> createTask() {
+//        String user = this.userName;
+//        ImageView tempStartButton = this.startButton;
 //        return new Task<Void>() {
 //            @Override
 //            protected Void call() throws Exception {
 //                File directory = new File(directoryPath);
 //                TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
+//                Properties properties = new Properties();
+//                String ackFileName = TestingController4.ACK_FILE_PATH + "cacheAcknowledgement.properties";
+//
 //                while (running) {
-//// System.out.println("inside the while loop");
+//
+//                    System.out.println("################################################################################");
+//                    System.out.println();
+//                    System.out.println("Running transfer data thread");
+//                    try {
+//                        FileInputStream fileInputStream = new FileInputStream(ackFileName);
+//                        properties.load(fileInputStream);
+//                        fileInputStream.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    Set<String> keys = properties.stringPropertyNames();
+//                    String[] keyArray = keys.toArray(new String[0]);
+//
+//
+////                    String isUserAccessed = null;
+////                    System.out.println("data transfer thread is runnuing");
+////                    try {
+////                        isUserAccessed = checkUpdate.checkUserAccess(user);
+////                        System.out.println("isUserAccessed "+isUserAccessed);
+////                    }catch (Exception e){
+////                        e.printStackTrace();
+////                    }
+////
+////
+////                    if (isUserAccessed.equalsIgnoreCase("no")){
+////                        try {
+////                            TestingController4 testObj = new TestingController4();
+////                            testObj.disableStartButton();
+//////                            tempStartButton.setDisable(true);
+////                        }catch (Exception e){
+////                            e.printStackTrace();
+////                        }
+//
+////                    }
+////                    System.out.println("inside the while loop");
+//                    System.out.println("Size of the key array : "+keyArray.length);
 //                    File[] files = directory.listFiles();
-//// System.out.println("Number of file present : " +files.length);
+//                    System.out.println("Size of the files array : "+files.length);
+////                    System.out.println("Number of file present : " +files.length);
 //                    if (files != null && files.length > 0) {
-//// System.out.println("Files found in directory " + directoryPath + ":");
-//                        for (File file : files) {
-//                            if (file.isDirectory()){
-//                                continue;
-//                            }
-//                            System.out.println(file.getName());
-//                            int responseCode = loadCacheFromDisk(file);
-//                            System.out.println("Sending reports response : " + responseCode);
-//                            if (responseCode == 200) {
-//                                System.out.println("Reports sends to server successfully!!");
-//                                System.out.println("Going to delete the file : " + file);
-//                                file.delete();
-//                                if (file.exists()) {
-//                                    System.out.println("File could not be deleted!!");
+//                        for (String key : keyArray) {
+//                            System.out.println("key : "+key+" value : "+properties.getProperty(key));
+//                            if (properties.getProperty(key).equals("0")) {
+//                                System.out.println("Key is 0, inside the if condition");
+////                        System.out.println("Files found in directory " + directoryPath + ":");
+//                                for (File file : files) {
+//                                    System.out.println("inside the file for loop");
+//                                    System.out.println("File : "+file.getName());
+////                            System.out.println(file.getName());
+//                                    if (file.getName().toString().equals(key)) {
+//                                        System.out.println("Key and file get matched !!");
+//                                        int responseCode = loadCacheFromDisk(file);
+//                                        if (responseCode == 200) {
+//                                            try {
+//                                                properties.setProperty(key, "1");
+//                                                // Save the modified properties back to the file
+//                                                OutputStream outputStream = new FileOutputStream(ackFileName);
+//                                                properties.store(outputStream, null);
+//                                                outputStream.close();
+//                                            } catch (Exception e) {
+//                                                e.printStackTrace();
+//                                            }
+//
+//                                            System.out.println("value of key after the updation : "+properties.getProperty(key));
+//
+////                                            try {
+////                                                file.delete();
+////                                            } catch (Exception e) {
+////                                                e.printStackTrace();
+////                                            }
+//
+//                                        }
+//                                    }
 //                                }
 //                            }
-//
-//
 //                        }
 //                    } else {
-//// System.out.println("No files found in directory " + directoryPath);
+////                        System.out.println("No files found in directory " + directoryPath);
 //                        try {
 //                            Thread.sleep(5000);
 //                        } catch (InterruptedException e) {
@@ -252,13 +199,67 @@ public class SimVerifyTransferDataToServerThread extends Service<Void> {
 //                    try {
 //                        Thread.sleep(5000); // wait for 5 seconds before checking again
 //                    } catch (InterruptedException e) {
-//// System.out.println("File checker thread interrupted");
+////                        System.out.println("File checker thread interrupted");
 //                    }
 //                }
 //                return null;
 //            }
 //        };
 //    }
+
+
+    //----------------------------------------------------------
+
+    @Override
+    protected Task<Void> createTask() {
+        return new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                File directory = new File(directoryPath);
+                TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
+                while (running) {
+// System.out.println("inside the while loop");
+                    File[] files = directory.listFiles();
+// System.out.println("Number of file present : " +files.length);
+                    if (files != null && files.length > 0) {
+// System.out.println("Files found in directory " + directoryPath + ":");
+                        for (File file : files) {
+                            if (file.isDirectory()){
+                                continue;
+                            }
+                            System.out.println(file.getName());
+                            int responseCode = loadCacheFromDisk(file);
+                            System.out.println("Sending reports response : " + responseCode);
+                            if (responseCode == 200) {
+                                System.out.println("Reports sends to server successfully!!");
+                                System.out.println("Going to delete the file : " + file);
+                                file.delete();
+                                if (file.exists()) {
+                                    System.out.println("File could not be deleted!!");
+                                    file.delete();
+                                }
+                            }
+
+
+                        }
+                    } else {
+// System.out.println("No files found in directory " + directoryPath);
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    try {
+                        Thread.sleep(5000); // wait for 5 seconds before checking again
+                    } catch (InterruptedException e) {
+// System.out.println("File checker thread interrupted");
+                    }
+                }
+                return null;
+            }
+        };
+    }
 
 
     //-----------------------------------------------------

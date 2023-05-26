@@ -216,6 +216,7 @@ public class TestingController4 extends LoginFormController implements Initializ
     private boolean resultCompilation = false;
     private boolean testingRunning = false;
     private boolean isDeviceConnected = true;
+    private boolean isIccidNull = false;
     private LoggerService loggerService;
     private String imsi;
     public String _terminal = "T";
@@ -257,347 +258,373 @@ public class TestingController4 extends LoginFormController implements Initializ
     }
 
     public void onStartButtonPress() {
-        ExportTestingResultPojo testingResultPojo = new ExportTestingResultPojo();
-        cardTestingPojosList.clear();
-        isDeviceConnected = true;
-        img_test_button.setImage(cancelButtonImage);
-        simCardVbox.getChildren().remove(img_status);
-        //Add Logs area
-        this.logTextArea = logTextArea;
-        logTextArea.setPrefSize(simCardVbox.getPrefWidth(), simCardVbox.getPrefHeight());
-        logTextArea.positionCaret(logTextArea.getLength());
-        logTextArea.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-        logTextArea.setEditable(false);
-        logTextArea.viewOrderProperty();
-        logTextArea.getStyleClass().add("text-area-left-aligned");
-        this.pane = pane;
-        pane = new ScrollPane(logTextArea);
-        Node horizontalScrollBar = pane.lookup(".scroll-bar:horizontal");
-        if (horizontalScrollBar != null) {
-            horizontalScrollBar.setStyle("-fx-pref-width: 1px;");
-        }
-        pane.setFitToWidth(true);
-        pane.setFitToHeight(true);
-        pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        simCardVbox.getChildren().add(pane);
+//        TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
+//        boolean isUserAccessed = service.checkUserAccessibility(loggedInUserName);
+//        if (isUserAccessed) {
+            ExportTestingResultPojo testingResultPojo = new ExportTestingResultPojo();
+            cardTestingPojosList.clear();
 
-        task1 = new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                //connect to terminal
-                // System.out.println("Inside the task 1");
-                boolean b1 = initializeTerminal();
-                setCardConnected(b1);
+            isDeviceConnected = true;
+            isIccidNull = false;
 
-                if (isCardConnected()) {
-                    // System.out.println("Card is connected ");
-                    // System.out.println("Iccid : " + getTerminal().getTerminalCardIccid());
-                    setLocalIccid(getTerminal().getTerminalCardIccid());
-                    setImsi(getTerminal().getImsi());
+            img_test_button.setImage(cancelButtonImage);
+            simCardVbox.getChildren().remove(img_status);
+            //Add Logs area
+            this.logTextArea = logTextArea;
+            logTextArea.setPrefSize(simCardVbox.getPrefWidth(), simCardVbox.getPrefHeight());
+            logTextArea.positionCaret(logTextArea.getLength());
+            logTextArea.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+            logTextArea.setEditable(false);
+            logTextArea.viewOrderProperty();
+            logTextArea.getStyleClass().add("text-area-left-aligned");
+            this.pane = pane;
+            pane = new ScrollPane(logTextArea);
+            Node horizontalScrollBar = pane.lookup(".scroll-bar:horizontal");
+            if (horizontalScrollBar != null) {
+                horizontalScrollBar.setStyle("-fx-pref-width: 1px;");
+            }
+            pane.setFitToWidth(true);
+            pane.setFitToHeight(true);
+            pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            simCardVbox.getChildren().add(pane);
 
-                    //get card from terminal
-                    try {
-                        Card card1 = getTerminal().getCt().connect("T=0");
-                        setCard(card1);
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
+            task1 = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    //connect to terminal
+                    // System.out.println("Inside the task 1");
+                    boolean b1 = initializeTerminal();
+                    setCardConnected(b1);
+
+                    if (isCardConnected()) {
+                        // System.out.println("Card is connected ");
+                        // System.out.println("Iccid : " + getTerminal().getTerminalCardIccid());
+                        setLocalIccid(getTerminal().getTerminalCardIccid());
+                        setImsi(getTerminal().getImsi());
+
+                        //get card from terminal
+                        try {
+                            Card card1 = getTerminal().getCt().connect("T=0");
+                            setCard(card1);
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                        return true;
+                    } else {
+                        return false;
                     }
-                    return true;
+
+                }
+            };
+
+            task2 = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    //connect to terminal
+                    displayLogs(_terminal, _card, "Starting File System Verification");
+                    // System.out.println("Inside the task 2");
+                    boolean b2 = fileSystemVerification();
+                    setFileSystemVerification(b2);
+                    return b2;
+                }
+            };
+
+            task3 = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    //connect to terminal
+                    // System.out.println("Inside the task 3");
+                    displayLogs(_terminal, _card, "Starting Profile Verification");
+                    boolean b3 = profileValidation();
+                    // System.out.println("profile test status : "+b3);
+                    setProfileTesting(b3);
+                    return b3;
+                }
+            };
+
+            task4 = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    //connect to terminal
+                    // System.out.println("Inside the task 4");
+                    displayLogs(_terminal, _card, "Starting Read/Write Test");
+                    boolean b4 = readWriteTest();
+
+                    setReadWriteTesting(b4);
+                    return b4;
+                }
+            };
+
+            task5 = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    //connect to terminal
+                    // System.out.println("Inside the task 5");
+                    boolean b5 = resultCompilation();
+                    setResultCompilation(b5);
+                    return b5;
+                }
+            };
+
+            task1.setOnSucceeded(event1 -> {
+                Boolean result = task1.getValue();
+                Platform.runLater(() -> {
+                    //set iccid in UI
+                    if (result) {
+                        img_test_status_1.setImage(loadingGif);
+                        displayLogs(_terminal, _ui, "Print ICCID");
+                        input_iccid.setText(getLocalIccid());
+                        displayLogs(_terminal, _ui, "Print IMSI");
+                        input_imsi.setText(getImsi());
+                        img_test_status_1.setImage(greenCheck);
+                        img_test_status_2.setImage(loadingGif);
+                    } else {
+                        displayLogs(_terminal, "SIM Heartbeat failed");
+                        img_test_status_1.setImage(redCross);
+                        displayLogs(_terminal, "Skipping File System Verification");
+                        img_test_status_2.setImage(redCross);
+                        displayLogs(_terminal, "Skipping Profile Verification");
+                        img_test_status_3.setImage(redCross);
+                        displayLogs(_terminal, "Skipping Read/Write Test");
+                        img_test_status_4.setImage(redCross);
+//                        displayLogs(_terminal,_card,"Skipping Result Compilation");
+                        img_test_status_5.setImage(redCross);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setTextFill(Color.RED);
+                        if (isDeviceConnected || isIccidNull) {
+                            messageTextArea.setText("Card is faulty, please go for SIM swap");
+                        }
+                    }
+
+                });
+                if (result) {
+                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
+                    testingResultPojo.setUserName(LoginFormController.loggedInUserName);
+                    testingResultPojo.setDateOfTesting(LocalDate.now().format(dateFormatter));
+                    testingResultPojo.setTimeOfTesting(LocalTime.now().format(timeFormatter));
+                    testingResultPojo.setTerminalNumber(this.terminal.getTerminalNumber() + 1);
+                    testingResultPojo.setTerminalICCID(this.localIccid);
+                    testingResultPojo.setTerminalIMSI(this.imsi);
+                    testingResultPojo.setSimHeartbeat("OK");
+
+
+                    Thread thread2 = new Thread(task2);
+                    this.threadList.add(thread2);
+                    thread2.start();
                 } else {
-                    return false;
+                    task2.cancel();
+                    task3.cancel();
+                    task4.cancel();
+                    task5.cancel();
+                    return;
                 }
 
-            }
-        };
+            });
 
-        task2 = new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                //connect to terminal
-                displayLogs(_terminal, _card, "Starting File System Verification");
-                // System.out.println("Inside the task 2");
-                boolean b2 = fileSystemVerification();
-                setFileSystemVerification(b2);
-                return b2;
-            }
-        };
-
-        task3 = new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                //connect to terminal
-                // System.out.println("Inside the task 3");
-                displayLogs(_terminal, _card, "Starting Profile Verification");
-                boolean b3 = profileValidation();
-                // System.out.println("profile test status : "+b3);
-                setProfileTesting(b3);
-                return b3;
-            }
-        };
-
-        task4 = new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                //connect to terminal
-                // System.out.println("Inside the task 4");
-                displayLogs(_terminal, _card, "Starting Read/Write Test");
-                boolean b4 = readWriteTest();
-
-                setReadWriteTesting(b4);
-                return b4;
-            }
-        };
-
-        task5 = new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                //connect to terminal
-                // System.out.println("Inside the task 5");
-                boolean b5 = resultCompilation();
-                setResultCompilation(b5);
-                return b5;
-            }
-        };
-
-        task1.setOnSucceeded(event1 -> {
-            Boolean result = task1.getValue();
-            Platform.runLater(() -> {
-                //set iccid in UI
-                if (result) {
-                    img_test_status_1.setImage(loadingGif);
-                    displayLogs(_terminal, _ui, "Print ICCID");
-                    input_iccid.setText(getLocalIccid());
-                    displayLogs(_terminal, _ui, "Print IMSI");
-                    input_imsi.setText(getImsi());
-                    img_test_status_1.setImage(greenCheck);
-                    img_test_status_2.setImage(loadingGif);
-                } else {
-                    displayLogs(_terminal, "SIM Heartbeat failed");
-                    img_test_status_1.setImage(redCross);
-                    displayLogs(_terminal, "Skipping File System Verification");
-                    img_test_status_2.setImage(redCross);
-                    displayLogs(_terminal, "Skipping Profile Verification");
-                    img_test_status_3.setImage(redCross);
-                    displayLogs(_terminal, "Skipping Read/Write Test");
-                    img_test_status_4.setImage(redCross);
-//                        displayLogs(_terminal,_card,"Skipping Result Compilation");
-                    img_test_status_5.setImage(redCross);
+            task2.setOnSucceeded(event2 -> {
+                Boolean result = task2.getValue();
+                Platform.runLater(() -> {
+                    if (result) {
+                        displayLogs(_terminal, _card, "File Verification done");
+                        img_test_status_2.setImage(greenCheck);
+                        img_test_status_3.setImage(loadingGif);
+                    } else {
+                        displayLogs(_terminal, "File Verification failed");
+                        img_test_status_2.setImage(redCross);
+                        displayLogs(_terminal, "Skipping Profile Verification");
+                        img_test_status_3.setImage(redCross);
+                        displayLogs(_terminal, "Skipping Read/Write Test");
+                        img_test_status_4.setImage(redCross);
+//                        displayLogs(_terminal,"Skipping Result Compilation");
+                        img_test_status_5.setImage(redCross);
 //                        okImageView.setImage(notOkImage);
-                    img_test_button.setImage(simFaulty);
-                    radioOptionsVBox.setVisible(true);
-                    messageTextArea.setVisible(true);
-                    messageTextArea.setTextFill(Color.RED);
-                    if (isDeviceConnected) {
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setTextFill(Color.RED);
                         messageTextArea.setText("Card is faulty, please go for SIM swap");
                     }
+
+                });
+
+                if (result) {
+                    testingResultPojo.setFileSystemVerification("OK");
+                    Thread thread3 = new Thread(task3);
+                    this.threadList.add(thread3);
+                    thread3.start();
+
+                } else {
+                    testingResultPojo.setFileSystemVerification("NOT OK");
+                    testingResultPojo.setProfileTesting("NOT OK");
+                    testingResultPojo.setReadWrite("NOT OK");
+                    testingResultPojo.setCardStatus("FAULTY");
+                    testingResultPojo.setTestCompilation("OK");
+                    testingResultPojo.setUserName(LoginFormController.loggedInUserName);
+                    cardTestingPojosList.add(testingResultPojo);
+                    sendResultToServer();
+                    exportIcon.setVisible(true);
+
+                    task3.cancel();
+                    task4.cancel();
+                    task5.cancel();
+                    return;
                 }
 
             });
-            if (result) {
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
-                testingResultPojo.setUserName(LoginFormController.loggedInUserName);
-                testingResultPojo.setDateOfTesting(LocalDate.now().format(dateFormatter));
-                testingResultPojo.setTimeOfTesting(LocalTime.now().format(timeFormatter));
-                testingResultPojo.setTerminalNumber(this.terminal.getTerminalNumber() + 1);
-                testingResultPojo.setTerminalICCID(this.localIccid);
-                testingResultPojo.setTerminalIMSI(this.imsi);
-                testingResultPojo.setSimHeartbeat("OK");
 
-
-                Thread thread2 = new Thread(task2);
-                this.threadList.add(thread2);
-                thread2.start();
-            } else {
-                task2.cancel();
-                task3.cancel();
-                task4.cancel();
-                task5.cancel();
-                return;
-            }
-
-        });
-
-        task2.setOnSucceeded(event2 -> {
-            Boolean result = task2.getValue();
-            Platform.runLater(() -> {
-                if (result) {
-                    displayLogs(_terminal, _card, "File Verification done");
-                    img_test_status_2.setImage(greenCheck);
-                    img_test_status_3.setImage(loadingGif);
-                } else {
-                    displayLogs(_terminal, "File Verification failed");
-                    img_test_status_2.setImage(redCross);
-                    displayLogs(_terminal, "Skipping Profile Verification");
-                    img_test_status_3.setImage(redCross);
-                    displayLogs(_terminal, "Skipping Read/Write Test");
-                    img_test_status_4.setImage(redCross);
+            task3.setOnSucceeded(event3 -> {
+                Boolean result = task3.getValue();
+                Platform.runLater(() -> {
+                    if (result) {
+                        displayLogs(_terminal, "Profile Verification done");
+                        img_test_status_3.setImage(greenCheck);
+                        img_test_status_4.setImage(loadingGif);
+                    } else {
+                        displayLogs(_terminal, "Profile Verification failed");
+                        img_test_status_3.setImage(redCross);
+                        displayLogs(_terminal, "Skipping Read/Write Test");
+                        img_test_status_4.setImage(redCross);
 //                        displayLogs(_terminal,"Skipping Result Compilation");
-                    img_test_status_5.setImage(redCross);
+                        img_test_status_5.setImage(redCross);
 //                        okImageView.setImage(notOkImage);
-                    img_test_button.setImage(simFaulty);
-                    radioOptionsVBox.setVisible(true);
-                    messageTextArea.setVisible(true);
-                    messageTextArea.setTextFill(Color.RED);
-                    messageTextArea.setText("Card is faulty, please go for SIM swap");
-                }
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setTextFill(Color.RED);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
+                    }
 
-            });
+                });
 
-            if (result) {
-                testingResultPojo.setFileSystemVerification("OK");
-                Thread thread3 = new Thread(task3);
-                this.threadList.add(thread3);
-                thread3.start();
-
-            } else {
-                testingResultPojo.setFileSystemVerification("NOT OK");
-                testingResultPojo.setProfileTesting("NOT OK");
-                testingResultPojo.setReadWrite("NOT OK");
-                testingResultPojo.setCardStatus("FAULTY");
-                testingResultPojo.setTestCompilation("OK");
-                testingResultPojo.setUserName(LoginFormController.loggedInUserName);
-                cardTestingPojosList.add(testingResultPojo);
-                sendResultToServer();
-                exportIcon.setVisible(true);
-
-                task3.cancel();
-                task4.cancel();
-                task5.cancel();
-                return;
-            }
-
-        });
-
-        task3.setOnSucceeded(event3 -> {
-            Boolean result = task3.getValue();
-            Platform.runLater(() -> {
                 if (result) {
-                    displayLogs(_terminal, "Profile Verification done");
-                    img_test_status_3.setImage(greenCheck);
-                    img_test_status_4.setImage(loadingGif);
+                    testingResultPojo.setProfileTesting("OK");
+                    Thread thread4 = new Thread(task4);
+                    this.threadList.add(thread4);
+                    thread4.start();
                 } else {
-                    displayLogs(_terminal, "Profile Verification failed");
-                    img_test_status_3.setImage(redCross);
-                    displayLogs(_terminal, "Skipping Read/Write Test");
-                    img_test_status_4.setImage(redCross);
-//                        displayLogs(_terminal,"Skipping Result Compilation");
-                    img_test_status_5.setImage(redCross);
-//                        okImageView.setImage(notOkImage);
-                    img_test_button.setImage(simFaulty);
-                    radioOptionsVBox.setVisible(true);
-                    messageTextArea.setVisible(true);
-                    messageTextArea.setTextFill(Color.RED);
-                    messageTextArea.setText("Card is faulty, please go for SIM swap");
+                    testingResultPojo.setProfileTesting("NOT OK");
+                    testingResultPojo.setReadWrite("NOT OK");
+                    testingResultPojo.setCardStatus("FAULTY");
+                    testingResultPojo.setTestCompilation("OK");
+                    testingResultPojo.setUserName(LoginFormController.loggedInUserName);
+                    cardTestingPojosList.add(testingResultPojo);
+                    sendResultToServer();
+                    exportIcon.setVisible(true);
+
+                    task4.cancel();
+                    task5.cancel();
+                    return;
                 }
 
             });
 
-            if (result) {
-                testingResultPojo.setProfileTesting("OK");
-                Thread thread4 = new Thread(task4);
-                this.threadList.add(thread4);
-                thread4.start();
-            } else {
-                testingResultPojo.setProfileTesting("NOT OK");
-                testingResultPojo.setReadWrite("NOT OK");
-                testingResultPojo.setCardStatus("FAULTY");
-                testingResultPojo.setTestCompilation("OK");
-                testingResultPojo.setUserName(LoginFormController.loggedInUserName);
-                cardTestingPojosList.add(testingResultPojo);
-                sendResultToServer();
-                exportIcon.setVisible(true);
+            task4.setOnSucceeded(event4 -> {
+                Boolean result = task4.getValue();
+                Platform.runLater(() -> {
+                    if (result) {
+                        img_test_status_4.setImage(greenCheck);
+                        img_test_status_5.setImage(loadingGif);
+                    } else {
+                        displayLogs(_terminal, "Read/Write Test failed");
+                        img_test_status_4.setImage(redCross);
+                        img_test_status_5.setImage(redCross);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setTextFill(Color.RED);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
+                    }
 
-                task4.cancel();
-                task5.cancel();
-                return;
-            }
+                });
 
-        });
-
-        task4.setOnSucceeded(event4 -> {
-            Boolean result = task4.getValue();
-            Platform.runLater(() -> {
                 if (result) {
-                    img_test_status_4.setImage(greenCheck);
-                    img_test_status_5.setImage(loadingGif);
+                    testingResultPojo.setReadWrite("OK");
+                    Thread thread5 = new Thread(task5);
+                    this.threadList.add(thread5);
+                    thread5.start();
                 } else {
-                    displayLogs(_terminal, "Read/Write Test failed");
-                    img_test_status_4.setImage(redCross);
-                    img_test_status_5.setImage(redCross);
-//                        okImageView.setImage(notOkImage);
-                    img_test_button.setImage(simFaulty);
-                    radioOptionsVBox.setVisible(true);
-                    messageTextArea.setVisible(true);
-                    messageTextArea.setTextFill(Color.RED);
-                    messageTextArea.setText("Card is faulty, please go for SIM swap");
+                    testingResultPojo.setReadWrite("NOT OK");
+                    testingResultPojo.setCardStatus("FAULTY");
+                    testingResultPojo.setTestCompilation("OK");
+                    testingResultPojo.setUserName(LoginFormController.loggedInUserName);
+                    cardTestingPojosList.add(testingResultPojo);
+                    sendResultToServer();
+                    exportIcon.setVisible(true);
+
+                    task5.cancel();
+                    return;
                 }
 
             });
 
-            if (result) {
-                testingResultPojo.setReadWrite("OK");
-                Thread thread5 = new Thread(task5);
-                this.threadList.add(thread5);
-                thread5.start();
-            } else {
-                testingResultPojo.setReadWrite("NOT OK");
-                testingResultPojo.setCardStatus("FAULTY");
-                testingResultPojo.setTestCompilation("OK");
-                testingResultPojo.setUserName(LoginFormController.loggedInUserName);
-                cardTestingPojosList.add(testingResultPojo);
-                sendResultToServer();
-                exportIcon.setVisible(true);
-
-                task5.cancel();
-                return;
-            }
-
-        });
-
-        task5.setOnSucceeded(event5 -> {
-            Boolean result = task5.getValue();
-            Platform.runLater(() -> {
-                if (result) {
-                    img_test_status_5.setImage(greenCheck);
-                    img_test_button.setImage(simOk);
+            task5.setOnSucceeded(event5 -> {
+                Boolean result = task5.getValue();
+                Platform.runLater(() -> {
+                    if (result) {
+                        img_test_status_5.setImage(greenCheck);
+                        img_test_button.setImage(simOk);
 //                        simCardVbox.getChildren().remove(this.pane);
 //                        simCardVbox.getChildren().add(img_status);
 //                        img_status.setImage(okImage);
 //                        okImageView.setImage(okImage);
-                    radioOptionsVBox.setVisible(true);
-                    messageTextArea.setVisible(true);
-                    messageTextArea.setTextFill(Color.GREEN);
-                    messageTextArea.setText("Card is OK, please check other SOP if problem persists");
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setTextFill(Color.GREEN);
+                        messageTextArea.setText("Card is OK, please check other SOP if problem persists");
+
+                    } else {
+                        img_test_status_5.setImage(redCross);
+//                        okImageView.setImage(notOkImage);
+                        img_test_button.setImage(simFaulty);
+                        radioOptionsVBox.setVisible(true);
+                        messageTextArea.setVisible(true);
+                        messageTextArea.setTextFill(Color.RED);
+                        messageTextArea.setText("Card is faulty, please go for SIM swap");
+                    }
+
+                });
+                if (result) {
+                    testingResultPojo.setCardStatus("OK");
+                    testingResultPojo.setTestCompilation("OK");
+                    testingResultPojo.setUserName(LoginFormController.loggedInUserName);
+                    cardTestingPojosList.add(testingResultPojo);
+                    sendResultToServer();
+                    exportIcon.setVisible(true);
 
                 } else {
-                    img_test_status_5.setImage(redCross);
-//                        okImageView.setImage(notOkImage);
-                    img_test_button.setImage(simFaulty);
-                    radioOptionsVBox.setVisible(true);
-                    messageTextArea.setVisible(true);
-                    messageTextArea.setTextFill(Color.RED);
-                    messageTextArea.setText("Card is faulty, please go for SIM swap");
+
                 }
-
             });
-            if (result) {
-                testingResultPojo.setCardStatus("OK");
-                testingResultPojo.setTestCompilation("OK");
-                testingResultPojo.setUserName(LoginFormController.loggedInUserName);
-                cardTestingPojosList.add(testingResultPojo);
-                sendResultToServer();
-                exportIcon.setVisible(true);
 
-            } else {
+            Thread thread1 = new Thread(task1);
+            this.threadList.add(thread1);
+            thread1.start();
+//        } else {
+//            licenseExpired();
+//        }
 
+    }
+
+    public void licenseExpired() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("License Expired!!");
+        ButtonType okButton = new ButtonType("OK");
+        alert.setContentText("License Expired");
+        alert.setHeaderText(null);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().setAll(okButton);
+        alert.showAndWait().ifPresent(button -> {
+            if (button == okButton) {
+                alert.close();
             }
         });
-
-        Thread thread1 = new Thread(task1);
-        this.threadList.add(thread1);
-        thread1.start();
-
     }
 
 
@@ -626,7 +653,7 @@ public class TestingController4 extends LoginFormController implements Initializ
     public void checkUpdate() {
         CheckUpdate checkUpdate = new CheckUpdate();
         String latestVersion = null;
-        String currentVersion = "1.0";
+        String currentVersion = checkUpdate.getCurrentVersion();
         Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
         alert1.setTitle("Checking for updates ...");
 
@@ -725,7 +752,7 @@ public class TestingController4 extends LoginFormController implements Initializ
         }
     }
 
-    public void disableStartButton(){
+    public void disableStartButton() {
         img_test_button.setDisable(true);
     }
 
@@ -759,7 +786,7 @@ public class TestingController4 extends LoginFormController implements Initializ
         cardPojos.setRequestSimVerificationCardPojos(cardTestingPojosList);
         int statusCode = 0;
         try {
-//            statusCode = service.sendReportsToServer(cardPojos);
+            statusCode = service.sendReportsToServer(cardPojos);
         } catch (Exception e) {
             System.out.println("Reports are failed to send to server");
         }
@@ -781,7 +808,7 @@ public class TestingController4 extends LoginFormController implements Initializ
         if (!ackDir.exists()) {
             ackDir.mkdir();
         }
-        File ackFile = new File((ACK_FILE_PATH+ackFileName));
+        File ackFile = new File((ACK_FILE_PATH + ackFileName));
         if (!ackFile.exists()) {
             try {
                 ackFile.createNewFile();
@@ -822,13 +849,13 @@ public class TestingController4 extends LoginFormController implements Initializ
 
         BufferedWriter writer = null;
         try {
-            writer = new BufferedWriter(new FileWriter(ACK_FILE_PATH+ackFileName, true));
+            writer = new BufferedWriter(new FileWriter(ACK_FILE_PATH + ackFileName, true));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        try  {
-            writer.write(cacheFileName+"=0");
+        try {
+            writer.write(cacheFileName + "=0");
             writer.newLine(); // Optional: Add a new line after the appended text
             System.out.println("Text appended successfully.");
 
@@ -934,11 +961,13 @@ public class TestingController4 extends LoginFormController implements Initializ
 
             // Create a textField
             TextField textField = new TextField();
-            TextFormatter<String> textFormatter = new TextFormatter<>(change -> { if (change.getControlNewText().length() <= 20) {
-                return change;
-            } else {
-                return null;
-            } });
+            TextFormatter<String> textFormatter = new TextFormatter<>(change -> {
+                if (change.getControlNewText().length() <= 20) {
+                    return change;
+                } else {
+                    return null;
+                }
+            });
             textField.setTextFormatter(textFormatter);
 
 // textField.setStyle("-fx-background-color: inherit;");
@@ -1008,59 +1037,65 @@ public class TestingController4 extends LoginFormController implements Initializ
             });
 
             alert.setOnCloseRequest(e -> {
-            if (alert.getResult() == sendButton){
-                System.out.println("inside the get result");
+                if (alert.getResult() == sendButton) {
+                    System.out.println("inside the get result");
 //            alert.getDialogPane().lookupButton(sendButton).setOnMouseClicked(e -> {
 
-                System.out.println("Clicked on the send button");
-                AtomicReference<Boolean> validateString = new AtomicReference<>(true);
+                    System.out.println("Clicked on the send button");
+                    AtomicReference<Boolean> validateString = new AtomicReference<>(true);
 //                Optional<ButtonType> result = alert.showAndWait();
 //                if (result.get() == sendButton) {
-                System.out.println("calling function");
-                String str = textField.getText();
+                    System.out.println("calling function");
+                    String str = textField.getText();
 //                char lastChar = str.charAt(str.length() - 1);
 //                System.out.println("Last character : " + lastChar);
-                if (str.isEmpty()) {
-                    validateString.set(false);
-                    errorLabel.setText("ICCID can not be empty");
-                    e.consume();
-                } else if (!str.startsWith("899")) {
-                    validateString.set(false);
-                    errorLabel.setText("ICCID you have entered is not valid !");
-                    e.consume();
-                } else if (str.matches(".*[^a-zA-Z0-9].*")) {
-                    validateString.set(false);
-                    errorLabel.setText("ICCID you have entered is not valid !");
-                    e.consume();
-                } else if (str.length() < 19 || str.length() > 20) {
-                    validateString.set(false);
-                    errorLabel.setText("ICCID you have entered is not valid !");
-                    e.consume();
-                } else if (!Character.isDigit(str.charAt(str.length() - 1)) && str.charAt(str.length() - 1) != 'U') {
-                    validateString.set(false);
-                    errorLabel.setText("ICCID you have entered is not valid !");
-                    e.consume();
-                }
-
-                for (int i = 0; i < str.length() - 2; i++) {
-                    char currentChar = str.charAt(i);
-                    if (Character.isLetter(currentChar)) {
+                    if (str.isEmpty()) {
+                        validateString.set(false);
+                        errorLabel.setText("ICCID can not be empty");
+                        e.consume();
+                    } else if (!str.startsWith("899")) {
+                        validateString.set(false);
+                        errorLabel.setText("ICCID you have entered is not valid !");
+                        e.consume();
+                    } else if (str.matches(".*[^a-zA-Z0-9].*")) {
+                        validateString.set(false);
+                        errorLabel.setText("ICCID you have entered is not valid !");
+                        e.consume();
+                    } else if (str.length() < 19 || str.length() > 20) {
+                        validateString.set(false);
+                        errorLabel.setText("ICCID you have entered is not valid !");
+                        e.consume();
+                    } else if (!Character.isDigit(str.charAt(str.length() - 1)) && str.charAt(str.length() - 1) != 'U') {
                         validateString.set(false);
                         errorLabel.setText("ICCID you have entered is not valid !");
                         e.consume();
                     }
-                }
 
-                if (validateString.get()) {
-                    try {
-                        alert.close();
-                        System.out.println("calling deadCardSendButton");
-                        deadCardSendButton(testingResultPojo, textField.getText());
-                    } catch (Exception exception) {
-                        System.out.println("Exception in deadCardSendButton");
-                        exception.printStackTrace();
+                    for (int i = 0; i < str.length() - 2; i++) {
+                        char currentChar = str.charAt(i);
+                        if (Character.isLetter(currentChar)) {
+                            validateString.set(false);
+                            errorLabel.setText("ICCID you have entered is not valid !");
+                            e.consume();
+                        }
                     }
-                }
+
+                    if (validateString.get()) {
+                        try {
+
+                            try {
+                                alert.close();
+                            }catch (Exception e1){
+                                e1.printStackTrace();
+                            }
+
+                            System.out.println("calling deadCardSendButton");
+                            deadCardSendButton(testingResultPojo, textField.getText());
+                        } catch (Exception exception) {
+                            System.out.println("Exception in deadCardSendButton");
+                            exception.printStackTrace();
+                        }
+                    }
 //                }
 
 
@@ -1075,9 +1110,12 @@ public class TestingController4 extends LoginFormController implements Initializ
 //                    e.consume(); // Prevent closing the alert
 //                }
 //             });
-            }else if(alert.getResult() == cancelButton){
-                alert.close();
+                } else if (alert.getResult() == cancelButton) {
+                    alert.close();
+                }else {
+                    alert.close();
                 }
+
             });
 
 
@@ -1169,7 +1207,7 @@ public class TestingController4 extends LoginFormController implements Initializ
     }
 
     private boolean initializeTerminal() throws CardException {
-        displayLogs(_terminal, _card, "Calling fetchterminal");
+        displayLogs(_terminal, _card, "Calling fetchterminal. Please wait...");
         TerminalConnectService terminalConnectService = new TerminalConnectServiceImpl(this);
         try {
             List<TerminalInfo> terminalInfos = terminalConnectService.fetchTerminalInfo();
@@ -1181,6 +1219,10 @@ public class TestingController4 extends LoginFormController implements Initializ
                 TerminalInfo terminal1 = terminalInfos.get(0);
                 setTerminal(terminal1);
 
+                if(terminal1.getTerminalCardIccid() == null || "".equalsIgnoreCase(terminal1.getTerminalCardIccid())){
+                    isIccidNull = true;
+                    return false;
+                }
 //            this.woId = "1184";
                 int terminalId1 = terminal.getTerminalNumber();
                 setTerminalId(terminalId1);

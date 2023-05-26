@@ -42,6 +42,7 @@ public class CheckUpdate {
     String userAgent = null;
     String proxyEnabled = null;
     File file ;
+    int timeout = 20000;
 
     public CheckUpdate(){
         file = new File(filePath+"proxy.properties");
@@ -272,6 +273,11 @@ public class CheckUpdate {
 //            httpConn.setAuthenticationProperty("Authorization", "Negotiate " + encodedUserPwd);
 
             conn.setRequestMethod("GET");
+
+            conn.setConnectTimeout(timeout);
+            conn.setReadTimeout(timeout);
+
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -289,6 +295,8 @@ public class CheckUpdate {
 //            latestVersion = scanner.nextLine();
 //            scanner.close();
 
+        } catch (SocketTimeoutException e) {
+            System.out.println("Request timed out");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -394,6 +402,10 @@ public class CheckUpdate {
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
+
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
+
             connection.connect();
             InputStream inputStream = connection.getInputStream();
             Files.copy(inputStream, updateFilePath, StandardCopyOption.REPLACE_EXISTING);
@@ -415,6 +427,8 @@ public class CheckUpdate {
 //            //closing application
 //            System.exit(0);
 
+        } catch (SocketTimeoutException e) {
+            System.out.println("Request timed out");
         } catch (IOException e) {
             e.printStackTrace();
 //            Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -440,6 +454,10 @@ public class CheckUpdate {
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
+
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
+
             connection.connect();
             InputStream inputStream = connection.getInputStream();
             Files.copy(inputStream, updateFilePath, StandardCopyOption.REPLACE_EXISTING);
@@ -469,6 +487,16 @@ public class CheckUpdate {
 //            updateNewVersionInConfig("1.1");
             //closing application
 //            System.exit(0);
+
+        } catch (SocketTimeoutException e) {
+            System.out.println("Request timed out");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Download Failed");
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+            alert.setHeaderText("Failed to download the update.");
+            alert.setContentText("Please try again later.");
+            alert.showAndWait();
 
         } catch (IOException e) {
             e.printStackTrace();

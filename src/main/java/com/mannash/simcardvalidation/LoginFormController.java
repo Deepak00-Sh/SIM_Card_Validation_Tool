@@ -85,7 +85,7 @@ public class LoginFormController {
             try {
                 writeConfigFile("", "1", userId);
             } catch (Exception e) {
-                System.out.println("Server not responding for writeing config");
+                System.out.println("Server not responding for writing config");
 //                e.printStackTrace();
             }
 

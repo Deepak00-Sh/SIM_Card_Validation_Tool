@@ -207,8 +207,43 @@ public class FileSystemVerification {
 		if (!sendRawApduNoPrint("00B0000009")) {
 			return null;
 		}
-		return nibbleSwap(getResponse());
+		String str = nibbleSwap(getResponse());
+		System.out.println("imsi from file system test : "+str);
+//		for (int i = 0; i < str.length() - 2; i++) {
+//			char currentChar = str.charAt(i);
+//			if (Character.isLetter(currentChar)) {
+//				return null;
+//			}
+//		}
+		if (str == null){
+			return null;
+		}
+		return str;
 	}
+
+//	public String getIMSI() {
+//		try {
+////		sendRawApduNoPrint("00A4000402 3F00");
+//			if (!sendRawApduNoPrint("00A4040C10 " + this.aID)) {
+//				return null;
+//			}
+//			if (!sendRawApduNoPrint("00A4090C02 6F07")) {
+//				return null;
+//			}
+//			if (!sendRawApduNoPrint("00B0000009")) {
+//				return null;
+//			}
+//			String s1 = nibbleSwap(sendRawApduNoPrint("00B0000009"));
+//			if (s1 != null) {
+//				s1 = s1.substring(3);
+//				return s1;
+//			}
+//		} catch (Exception e) {
+//			// e.printStackTrace();
+////			return null;
+//		}
+//		return null;
+//	}
 
 	public String getSW1Text() {
 		StringBuffer stringBuffer = new StringBuffer();

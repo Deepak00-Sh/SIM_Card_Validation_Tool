@@ -55,6 +55,7 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 	String proxyPort = null;
 	String userAgent = null;
 	String proxyEnabled = null;
+	int timeout = 20000;
 
 
 
@@ -172,6 +173,9 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 				HttpURLConnection response = (HttpURLConnection) url.openConnection();
 				response.setRequestMethod("POST");
 
+				response.setConnectTimeout(timeout);
+				response.setReadTimeout(timeout);
+
 				InputStream inputStream = response.getInputStream();
 				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 				String line;
@@ -241,6 +245,10 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 					responseAuthenticationPojo.setStatusCode(500);
 					// this.logger.debug("Unable to authenticate user, response is null");
 				}
+
+			} catch (SocketTimeoutException e) {
+				System.out.println("Request timed out");
+//				readCredentialsFromLocal(userName,password);
 			} catch (Exception e) {
 				readCredentialsFromLocal(userName,password);
 				System.out.println("inside the catch");
@@ -683,6 +691,11 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 			URL url = new URL(completeUrl);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
+
+			connection.setConnectTimeout(timeout);
+			connection.setReadTimeout(timeout);
+
+
 			connection.connect();
 			int statusCode = connection.getResponseCode();
 			System.out.println("Status : " + statusCode);
@@ -726,6 +739,9 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 
 //			return responseProfileTestingConfig;
 
+		}catch (SocketTimeoutException e2){
+			System.out.println("Request timed out");
+			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -751,27 +767,17 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 		try {
 		// Set the URL of the API
 		String completeUrl = "http://103.228.113.86:32100/svr/receive";
-		URL url = null;
-		try {
-			url = new URL(completeUrl);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+		URL	url = new URL(completeUrl);
 
-
-		try {
 			conn = (HttpURLConnection) url.openConnection();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		try {
 			conn.setRequestMethod("POST");
-		} catch (ProtocolException e) {
-			throw new RuntimeException(e);
-		}
 
-		conn.setRequestProperty("Content-Type", "application/json");
+
+			conn.setConnectTimeout(timeout);
+			conn.setReadTimeout(timeout);
+
+
+			conn.setRequestProperty("Content-Type", "application/json");
 
 		conn.setDoOutput(true);
 		conn.setDoInput(true);
@@ -806,7 +812,9 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 
 		System.out.println("Status code : "+statusCode);
 
-	} catch (Exception e) {
+		} catch (SocketTimeoutException e) {
+			System.out.println("Request timed out");
+		} catch (Exception e) {
 		e.printStackTrace();
 	} finally {
 		if (conn != null) {
@@ -871,6 +879,10 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 			URL url = new URL(completeUrl);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
+
+			connection.setConnectTimeout(timeout);
+			connection.setReadTimeout(timeout);
+
 			connection.connect();
 			int statusCode = connection.getResponseCode();
 			System.out.println("Status : " + statusCode);
@@ -942,6 +954,10 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 //
 //			return responseTestingConfig;
 
+
+		} catch (SocketTimeoutException e) {
+			System.out.println("Request timed out");
+			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -1011,6 +1027,10 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 			URL url = new URL(completeUrl);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
+
+			connection.setConnectTimeout(timeout);
+			connection.setReadTimeout(timeout);
+
 			connection.connect();
 			int statusCode = connection.getResponseCode();
 			System.out.println("Status : " + statusCode);
@@ -1049,6 +1069,9 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 			
 			return responseStressTestingConfig;
 
+		} catch (SocketTimeoutException e) {
+			System.out.println("Request timed out");
+			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -1060,6 +1083,41 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	public boolean checkUserAccessibility (String userId) {
+//        String version = null;
+
+		String isUserAccessed = null;
+		try {
+			URL url = new URL("http://103.228.113.86:32100/trakmeserver/simverify/singleCard/userAccess/" + userId + ".txt");
+
+			HttpURLConnection conn = null;
+//			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, Integer.parseInt(proxyPort)));
+			conn = (HttpURLConnection) url.openConnection();
+
+			conn.setRequestMethod("GET");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				isUserAccessed = line;
+			}
+			reader.close();
+			conn.disconnect();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+		if (isUserAccessed.equalsIgnoreCase("yes")){
+			return true;
+		}else {
+			return false;
+		}
+
+
 	}
 
 

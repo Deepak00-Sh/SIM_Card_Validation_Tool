@@ -89,6 +89,7 @@ public class LoginForm extends Application {
 //            }
 //        }
 //);
+
         try {
             String version = checkUpdate.getLatestVersion();
             System.out.println("Get current version : "+checkUpdate.getCurrentVersion());
@@ -98,7 +99,6 @@ public class LoginForm extends Application {
                 System.out.println("Downloading the new version ...");
                 System.out.println("Current version : " + checkUpdate.getCurrentVersion());
                 System.out.println("New Version : " + checkUpdate.getLatestVersion());
-//                    checkUpdate.downloadUpdatedJarFileOnStart();
                 checkUpdate.downloadOnStart();
             }
 
