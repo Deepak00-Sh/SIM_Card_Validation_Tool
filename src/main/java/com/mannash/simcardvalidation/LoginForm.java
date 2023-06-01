@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import java.net.Authenticator;import java.net.PasswordAuthentication;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoginForm extends Application {
     public static String getVersion(){
@@ -74,40 +75,58 @@ public class LoginForm extends Application {
             });
         }));
 
-        CheckUpdate checkUpdate = new CheckUpdate();
-//        final String authUser = "A13JLHLE";
-//        final String authPassword = "1#Wahkqu";
-//
-//        System.setProperty("http.proxyHost", "airtelproxy.airtel.com");
-//        System.setProperty("http.proxyPort", "4145");
-//        System.setProperty("http.proxyUser", authUser);
-//        System.setProperty("http.proxyPassword", authPassword);
-//
-//        Authenticator.setDefault(new Authenticator() {
-//        public PasswordAuthentication getPasswordAuthentication() {
-//        return new PasswordAuthentication(authUser, authPassword.toCharArray());
-//            }
-//        }
-//);
-
-        try {
-            String version = checkUpdate.getLatestVersion();
-            System.out.println("Get current version : "+checkUpdate.getCurrentVersion());
-            System.out.println("Get new version : "+version);
-
-            if (!checkUpdate.getCurrentVersion().equals(checkUpdate.getLatestVersion())) {
-                System.out.println("Downloading the new version ...");
-                System.out.println("Current version : " + checkUpdate.getCurrentVersion());
-                System.out.println("New Version : " + checkUpdate.getLatestVersion());
-                checkUpdate.downloadOnStart();
-            }
-
-        }catch (Exception e){
-            System.out.println("Unable to fetch version from the server , so skipping update on start!!");
-            e.printStackTrace();
-        }
-
         timeline.play();
+
+//        CheckUpdate checkUpdate = new CheckUpdate();
+//        try {
+//            String version = checkUpdate.getLatestVersion();
+//            System.out.println("Get current version : "+checkUpdate.getCurrentVersion());
+//            System.out.println("Get new version : "+version);
+//
+//            if (!checkUpdate.getCurrentVersion().equals(checkUpdate.getLatestVersion())) {
+//                System.out.println("Downloading the new version ...");
+//                System.out.println("Current version : " + checkUpdate.getCurrentVersion());
+//                System.out.println("New Version : " + checkUpdate.getLatestVersion());
+//                checkUpdate.downloadOnStart();
+//            }
+//
+//        }catch (Exception e){
+//            System.out.println("Unable to fetch version from the server , so skipping update on start!!");
+//            e.printStackTrace();
+//        }
+
+
+        AtomicBoolean downloadComplete = new AtomicBoolean(false);
+        Thread downloadThread = new Thread(() -> {
+            CheckUpdate checkUpdate = new CheckUpdate();
+            try {
+                String version = checkUpdate.getLatestVersion();
+                System.out.println("Get current version: " + checkUpdate.getCurrentVersion());
+                System.out.println("Get new version: " + version);
+
+                if (!checkUpdate.getCurrentVersion().equals(checkUpdate.getLatestVersion())) {
+                    System.out.println("Downloading the new version ...");
+                    System.out.println("Current version: " + checkUpdate.getCurrentVersion());
+                    System.out.println("New Version: " + checkUpdate.getLatestVersion());
+                    checkUpdate.downloadOnStart();
+                }
+                downloadComplete.set(true);
+            } catch (Exception e) {
+                System.out.println("Unable to fetch version from the server, so skipping update on start!!");
+                e.printStackTrace();
+            }
+        });
+
+        downloadThread.setDaemon(true); // Set the thread as a daemon to automatically terminate when the application exits
+        downloadThread.start();
+
+        timeline.setOnFinished(event -> {
+            if (downloadComplete.get()) {
+                downloadThread.interrupt(); // Interrupt the thread to stop it gracefully
+            }
+        });
+
+//        timeline.play();
 
     }
 

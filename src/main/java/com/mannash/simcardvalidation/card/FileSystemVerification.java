@@ -215,7 +215,8 @@ public class FileSystemVerification {
 //				return null;
 //			}
 //		}
-		if (str == null){
+
+		if (str == null || str.isEmpty() || str.isBlank()){
 			return null;
 		}
 		return str;

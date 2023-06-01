@@ -41,6 +41,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -258,6 +259,14 @@ public class TestingController4 extends LoginFormController implements Initializ
     }
 
     public void onStartButtonPress() {
+        String localVersion = getCurrentVersion();
+        String versionFromServer = getVersionFromServer();
+        System.out.println("Version from the server : "+versionFromServer);
+        if (!localVersion.equalsIgnoreCase(versionFromServer)){
+            updateAlert();
+            return;
+        }
+
 //        TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
 //        boolean isUserAccessed = service.checkUserAccessibility(loggedInUserName);
 //        if (isUserAccessed) {
@@ -605,9 +614,57 @@ public class TestingController4 extends LoginFormController implements Initializ
             this.threadList.add(thread1);
             thread1.start();
 //        } else {
-        //alert for licence expire
+            //alert for licence expire
 //            licenseExpired();
 //        }
+
+
+    }
+
+    public void updateAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Update Alert");
+        ButtonType restartButton = new ButtonType("Restart");
+        alert.setContentText("Update available, Please restart the application");
+        alert.setHeaderText(null);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().setAll(restartButton);
+        alert.showAndWait().ifPresent(button -> {
+            if (button == restartButton) {
+                System.exit(0);
+            }
+        });
+    }
+
+    public String getCurrentVersion() {
+        InputStream inputStream = CheckUpdate.class.getClassLoader().getResourceAsStream("application.properties");
+        Properties properties = new Properties();
+        try {
+            properties.load(inputStream);
+
+        } catch (IOException e) {
+            System.out.println("Application.properties file not found!!");
+            e.printStackTrace();
+        }
+        System.out.println("Version is : " + properties.getProperty("version"));
+        return properties.getProperty("version");
+
+    }
+
+    public String getVersionFromServer() {
+        InputStream inputStream = CheckUpdate.class.getClassLoader().getResourceAsStream("application.properties");
+        Properties properties = new Properties();
+        try {
+            properties.load(inputStream);
+
+        } catch (IOException e) {
+            System.out.println("Application.properties file not found!!");
+            e.printStackTrace();
+        }
+        System.out.println("Version is : " + properties.getProperty("version"));
+        return properties.getProperty("versionFromServer");
 
     }
 
