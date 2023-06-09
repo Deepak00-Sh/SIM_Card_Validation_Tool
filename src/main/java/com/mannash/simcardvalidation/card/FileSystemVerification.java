@@ -81,7 +81,7 @@ public class FileSystemVerification {
 			this.IMSI = getIMSI();
 			if (this.IMSI == null) {
 				controller.displayLogs(_card,_terminal,"Card IMSI not found");
-				return false;
+//				return false;
 			}
 			// this.logger.debug("\nREADING PROFILE FOR THE CARD WITHOUT VERIFYING
 			// ADM........................................................");
@@ -207,6 +207,7 @@ public class FileSystemVerification {
 		if (!sendRawApduNoPrint("00B0000009")) {
 			return null;
 		}
+		System.out.println("Response from file system : " + getSW1Text() +" "+ getSW2Text());
 		String str = nibbleSwap(getResponse());
 		System.out.println("imsi from file system test : "+str);
 //		for (int i = 0; i < str.length() - 2; i++) {

@@ -290,43 +290,44 @@ public class CheckUpdate {
 // Disconnect the connection
             conn.disconnect();
 
-            InputStream inputStream = CheckUpdate.class.getClassLoader().getResourceAsStream("application.properties");
-            Properties properties = new Properties();
-            try {
-                properties.load(inputStream);
-
-            } catch (IOException e) {
-                System.out.println("Application.properties file not found!!");
-                e.printStackTrace();
-            }
-            System.out.println("Version is : " + properties.getProperty("version"));
-
-            if (latestVersion != null || !latestVersion.isEmpty() || !latestVersion.isBlank()){
-                properties.setProperty("versionFromServer",latestVersion);
-                try {
-//                    File file = new File("application.properties");
-//                    File file = new File(CheckUpdate.class.getClassLoader().getResource("application.properties").toURI());
-//                    URL resourceUrl = CheckUpdate.class.getClassLoader().getResource("application.properties");
-
-
-//                    String filePath = CheckUpdate.class.getClassLoader().getResource("application.properties").getFile();
-
-
-                    ClassLoader classLoader = CheckUpdate.class.getClassLoader();
-                    URL resourceUrl = classLoader.getResource("application.properties");
-                    File propertiesFile = new File(resourceUrl.getFile());
-
-                    // Create an output stream to write to the file
-                    OutputStream outputStream = new FileOutputStream(propertiesFile);
-                    // Write the properties to the output stream
-                    properties.store(outputStream,null);
-                    // Close the output stream
-                    outputStream.close();
-//                    System.out.println("Properties written successfully to file.");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            //write latest version into properties file
+//            InputStream inputStream = CheckUpdate.class.getClassLoader().getResourceAsStream("application.properties");
+//            Properties properties = new Properties();
+//            try {
+//                properties.load(inputStream);
+//
+//            } catch (IOException e) {
+//                System.out.println("Application.properties file not found!!");
+//                e.printStackTrace();
+//            }
+//            System.out.println("Version is : " + properties.getProperty("version"));
+//
+//            if (latestVersion != null || !latestVersion.isEmpty() || !latestVersion.isBlank()){
+//                properties.setProperty("versionFromServer",latestVersion);
+//                try {
+////                    File file = new File("application.properties");
+////                    File file = new File(CheckUpdate.class.getClassLoader().getResource("application.properties").toURI());
+////                    URL resourceUrl = CheckUpdate.class.getClassLoader().getResource("application.properties");
+//
+//
+////                    String filePath = CheckUpdate.class.getClassLoader().getResource("application.properties").getFile();
+//
+//
+//                    ClassLoader classLoader = CheckUpdate.class.getClassLoader();
+//                    URL resourceUrl = classLoader.getResource("application.properties");
+//                    File propertiesFile = new File(resourceUrl.getFile());
+//
+//                    // Create an output stream to write to the file
+//                    OutputStream outputStream = new FileOutputStream(propertiesFile);
+//                    // Write the properties to the output stream
+//                    properties.store(outputStream,null);
+//                    // Close the output stream
+//                    outputStream.close();
+////                    System.out.println("Properties written successfully to file.");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
 
 
 
@@ -337,6 +338,7 @@ public class CheckUpdate {
 
         } catch (SocketTimeoutException e) {
             System.out.println("Request timed out");
+            return null;
         }catch (Exception e){
             e.printStackTrace();
         }

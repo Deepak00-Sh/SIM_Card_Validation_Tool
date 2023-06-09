@@ -33,6 +33,16 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
     public String _device = "D";
     public String _ui = "UI";
 
+    public String getSW() {
+        return SW;
+    }
+
+    public void setSW(String SW) {
+        this.SW = SW;
+    }
+
+    String SW;
+
     public TerminalConnectServiceImpl(TestingController4 testingController4) {
         controller = testingController4;
         this.loggerService = new LoggerServiceImpl();
@@ -200,11 +210,15 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
     }
 
     public String getIMSI(CardTerminal cardTerminal) {
+        System.out.println("############################### READING IMSI ##########################################");
         try {
 //			sendRawApduNoPrint(cardTerminal,"00A4000402 3F00");
             sendRawApduNoPrint(cardTerminal, "00A4040C10 " + this.AID);
+            System.out.println("getSW : "+getSW());
             sendRawApduNoPrint(cardTerminal, "00A4090C02 6F07");
+            System.out.println("getSW : "+getSW());
             String s1 = nibbleSwap(sendRawApduNoPrint(cardTerminal, "00B0000009"));
+            System.out.println("getSW : "+getSW());
             if (s1 != null) {
                 s1 = s1.substring(3);
                 return s1;
@@ -324,6 +338,12 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 //						getICCID(cardTerminal);
 //					}
                     String fetchedIccid = byteArrayToString(responseAPDU.getData());
+                    System.out.println("RESPONSE APDU SW : " + responseAPDU.getSW());
+                    String responseCode = Integer.toHexString(responseAPDU.getSW());
+                    setSW(responseCode);
+//                    System.out.println("Converted response APDU : " + Integer.toHexString(responseAPDU.getSW()));
+//                    System.out.println("Byte converted SW1 : " + (byte) responseAPDU.getSW1());
+//                    System.out.println("Byte converted SW2 : " + (byte) responseAPDU.getSW2());
                     return fetchedIccid;
                 } catch (Exception exception) {
                     // exception.printStackTrace();
