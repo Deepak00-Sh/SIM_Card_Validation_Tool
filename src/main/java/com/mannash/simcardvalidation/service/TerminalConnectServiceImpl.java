@@ -210,7 +210,7 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
     }
 
     public String getIMSI(CardTerminal cardTerminal) {
-        System.out.println("############################### READING IMSI ##########################################");
+//        System.out.println("############################### READING IMSI ##########################################");
         try {
 //			sendRawApduNoPrint(cardTerminal,"00A4000402 3F00");
             sendRawApduNoPrint(cardTerminal, "00A4040C10 " + this.AID);
@@ -338,7 +338,7 @@ public class TerminalConnectServiceImpl implements TerminalConnectService {
 //						getICCID(cardTerminal);
 //					}
                     String fetchedIccid = byteArrayToString(responseAPDU.getData());
-                    System.out.println("RESPONSE APDU SW : " + responseAPDU.getSW());
+//                    System.out.println("RESPONSE APDU SW : " + responseAPDU.getSW());
                     String responseCode = Integer.toHexString(responseAPDU.getSW());
                     setSW(responseCode);
 //                    System.out.println("Converted response APDU : " + Integer.toHexString(responseAPDU.getSW()));

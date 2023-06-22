@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -271,7 +272,12 @@ public class TestingController4 extends LoginFormController implements Initializ
         }
         System.out.println("Version from the server : "+versionFromServer);
         if (versionFromServer != null && !localVersion.equalsIgnoreCase(versionFromServer)){
-            updateAlert();
+            if(checkUpdate.isJarDownloaded()){
+                updateAlert();
+            }else{
+                updateAvailableAlert();
+            }
+
             return;
         }
 
@@ -664,6 +670,11 @@ public class TestingController4 extends LoginFormController implements Initializ
 
     }
 
+//    private boolean isJarDownloaded() {
+//        CheckUpdate checkUpdate = new CheckUpdate();
+//
+//    }
+
     public void updateAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Update Alert");
@@ -751,12 +762,75 @@ public class TestingController4 extends LoginFormController implements Initializ
         }
     }
 
+//    public void checkUpdate() {
+//        CheckUpdate checkUpdate = new CheckUpdate();
+//        String latestVersion = null;
+//        String currentVersion = checkUpdate.getCurrentVersion();
+//        Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+//        alert1.setTitle("Checking for updates ...");
+//
+//        try {
+//            latestVersion = checkUpdate.getLatestVersion();
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//        if (currentVersion.equals(latestVersion)) {
+//            Platform.runLater(() -> {
+//                Stage stage = (Stage) alert1.getDialogPane().getScene().getWindow();
+//                stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+//                alert1.setContentText("You are running the latest version.");
+//                alert1.setHeaderText("No updates available");
+//                alert1.showAndWait();
+//            });
+//        } else {
+//            Platform.runLater(() -> {
+//                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//                alert.setTitle("Checking for updates ...");
+//                ButtonType downloadUpdate = new ButtonType("Download");
+//                ButtonType noThanks = new ButtonType("No, thanks");
+//
+//                ProgressBar progressBar = new ProgressBar();
+//                progressBar.setVisible(false);
+//                progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+//
+//
+//                VBox vbox = new VBox();
+//                vbox.getChildren().addAll(new Label("Update Available."), progressBar);
+//                vbox.setSpacing(10);
+//                vbox.setAlignment(Pos.CENTER_LEFT);
+//                alert.getDialogPane().setContent(vbox);
+//
+//
+//                alert.setHeaderText(null);
+//                Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+//                stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+//                alert.getButtonTypes().clear();
+//                alert.getButtonTypes().setAll(downloadUpdate, noThanks);
+//                alert.setOnCloseRequest(event -> {
+//                    if (alert.getResult() == noThanks){
+//                        alert.close();
+//                    } else if (alert.getResult() == downloadUpdate) {
+//                        event.consume();
+//                        progressBar.setVisible(true);
+//                        checkUpdate.downloadJarFile();
+//                    }
+//                });
+//                alert.showAndWait();
+//
+////                alert.showAndWait().ifPresent(button -> {
+////                    if (button == downloadUpdate) {
+////                        checkUpdate.downloadJarFile();
+////                        progressBar.setVisible(true);
+////                    }
+////                });
+//            });
+//        }
+//    }
+
     public void checkUpdate() {
         CheckUpdate checkUpdate = new CheckUpdate();
         String latestVersion = null;
         String currentVersion = checkUpdate.getCurrentVersion();
-        Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
-        alert1.setTitle("Checking for updates ...");
 
         try {
             latestVersion = checkUpdate.getLatestVersion();
@@ -764,33 +838,45 @@ public class TestingController4 extends LoginFormController implements Initializ
             ex.printStackTrace();
         }
         if (currentVersion.equals(latestVersion)) {
-            Platform.runLater(() -> {
-                Stage stage = (Stage) alert1.getDialogPane().getScene().getWindow();
-                stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
-                alert1.setContentText("You are running the latest version.");
-                alert1.setHeaderText("No updates available");
-                alert1.showAndWait();
-            });
+            noUpdateAvailableAlert();
         } else {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Checking for updates ...");
-                ButtonType downloadUpdate = new ButtonType("Download");
-                ButtonType noThanks = new ButtonType("No, thanks");
-                alert.setContentText("Update Available.");
-                alert.setHeaderText(null);
-                Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
-                alert.getButtonTypes().clear();
-                alert.getButtonTypes().setAll(downloadUpdate, noThanks);
-                alert.showAndWait().ifPresent(button -> {
-                    if (button == downloadUpdate) {
-                        checkUpdate.downloadJarFile();
-                    }
-                });
-            });
+            updateAvailableAlert();
         }
     }
+
+    public void noUpdateAvailableAlert(){
+        Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+        alert1.setTitle("Checking for updates ...");
+        Platform.runLater(() -> {
+            Stage stage = (Stage) alert1.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+            alert1.setContentText("You are running the latest version.");
+            alert1.setHeaderText("No updates available");
+            alert1.showAndWait();
+        });
+    }
+
+    public void updateAvailableAlert(){
+        CheckUpdate checkUpdate = new CheckUpdate();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Checking for updates ...");
+            ButtonType downloadUpdate = new ButtonType("Download");
+            ButtonType noThanks = new ButtonType("No, thanks");
+            alert.setContentText("Update Available.");
+            alert.setHeaderText(null);
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().setAll(downloadUpdate, noThanks);
+            alert.showAndWait().ifPresent(button -> {
+                if (button == downloadUpdate) {
+                    checkUpdate.downloadJarFile();
+                }
+            });
+        });
+    }
+
 
     @FXML
     public void onExportButtonPress() {
@@ -1264,9 +1350,12 @@ public class TestingController4 extends LoginFormController implements Initializ
         testingResultPojo.setUserName(LoginFormController.loggedInUserName);
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning!");
+//            alert.setTitle("Warning!");
+            alert.setTitle("Warning : Card is ABSENT / FAULTY !");
             alert.setHeaderText(null);
-            alert.setContentText("Card is ABSENT/FAULTY. Please enter ICCID and MSISDN ");
+//            alert.setContentText("Card is ABSENT / FAULTY. Please enter ICCID / MSISDN ");
+//            alert.setContentText("Card is ABSENT / FAULTY. Please enter ICCID / MSISDN ");
+            alert.setContentText("Please enter last 7 digits of ICCID OR 10 digits MSISDN OR both");
             // Add a warning icon to the dialog pane
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
@@ -1283,7 +1372,7 @@ public class TestingController4 extends LoginFormController implements Initializ
             // Create a textField
             TextField textField = new TextField();
             TextFormatter<String> textFormatter = new TextFormatter<>(change -> {
-                if (change.getControlNewText().length() <= 20) {
+                if (change.getControlNewText().length() <= 7) {
                     return change;
                 } else {
                     return null;
@@ -1353,43 +1442,73 @@ public class TestingController4 extends LoginFormController implements Initializ
                     String str = textField.getText();
                     String msisdnStr = MSISDNtextField.getText();
                     System.out.println("size of msisdn : "+msisdnStr.length());
-                    if (str.isEmpty()) {
+                    if (str.isEmpty() && msisdnStr.isEmpty()) {
                         validateString.set(false);
                         errorLabel.setText("Details can not be empty");
                         e.consume();
+                        return;
                     }
-                     else if (!str.startsWith("899")) {
-                        validateString.set(false);
-                        errorLabel.setText("ICCID you have entered is not valid !");
-                        e.consume();
-                    } else if (str.matches(".*[^a-zA-Z0-9].*")) {
-                        validateString.set(false);
-                        errorLabel.setText("ICCID you have entered is not valid !");
-                        e.consume();
-                    } else if (str.length() < 5 || str.length() > 20) {
-                        validateString.set(false);
-                        errorLabel.setText("ICCID you have entered is not valid !");
-                        e.consume();
-                    } else if (!Character.isDigit(str.charAt(str.length() - 1)) && str.charAt(str.length() - 1) != 'U') {
-                        validateString.set(false);
-                        errorLabel.setText("ICCID you have entered is not valid !");
-                        e.consume();
+//                     else if (!str.startsWith("899")) {
+//                        validateString.set(false);
+//                        errorLabel.setText("ICCID you have entered is not valid !");
+//                        e.consume();
+//                    }
+
+                    if (!str.isEmpty() || str.length() > 0 ) {
+                        if (str.matches(".*[^a-zA-Z0-9].*")) {
+                            validateString.set(false);
+                            errorLabel.setText("ICCID you have entered is not valid !");
+                            e.consume();
+                            return;
+                        } else if (str.length() != 7) {
+                                validateString.set(false);
+                                errorLabel.setText("ICCID you have entered is not valid !");
+                                e.consume();
+                                return;
+                        } else if (!Character.isDigit(str.charAt(str.length() - 1))) {
+                            if (str.charAt(str.length() - 1) != 'U') {
+                                validateString.set(false);
+                                errorLabel.setText("ICCID you have entered is not valid !");
+                                e.consume();
+                                return;
+                            }
+                        }
+
+                        for (int i = 0; i <= str.length() - 2; i++) {
+                            char currentChar = str.charAt(i);
+                            if (Character.isLetter(currentChar)) {
+                                validateString.set(false);
+                                errorLabel.setText("ICCID you have entered is not valid !");
+                                e.consume();
+                                return;
+                            }
+                        }
                     }
 
 
-                     else if(!msisdnStr.isEmpty() || msisdnStr.length() > 0 ){
+                     if(!msisdnStr.isEmpty() || msisdnStr.length() > 0 ){
                          if (msisdnStr.length() < 10){
                              validateString.set(false);
-                             errorLabel.setText("A. MSISDN you have entered is not valid !");
+                             errorLabel.setText("MSISDN you have entered is not valid !");
                              e.consume();
-                         } else if (msisdnStr.startsWith("0")) {
+                         }
+//                         else if (msisdnStr.startsWith("0")) {
+//                             validateString.set(false);
+//                             errorLabel.setText("MSISDN you have entered is not valid !");
+//                             e.consume();
+//                         }
+                         else if (msisdnStr.matches(".*[^a-zA-Z0-9].*")) {
                              validateString.set(false);
-                             errorLabel.setText("B. MSISDN you have entered is not valid !");
+                             errorLabel.setText("MSISDN you have entered is not valid !");
                              e.consume();
-                         } else if (msisdnStr.matches(".*[^a-zA-Z0-9].*")) {
-                             validateString.set(false);
-                             errorLabel.setText("C. MSISDN you have entered is not valid !");
-                             e.consume();
+                         }
+                         for (int i = 0; i <= msisdnStr.length() - 1; i++) {
+                             char currentChar = msisdnStr.charAt(i);
+                             if (Character.isLetter(currentChar)) {
+                                 validateString.set(false);
+                                 errorLabel.setText("MSISDN you have entered is not valid !");
+                                 e.consume();
+                             }
                          }
                      }
 
@@ -1403,10 +1522,12 @@ public class TestingController4 extends LoginFormController implements Initializ
 
                             String iccidAndMsisdn = null;
 
-                            if (!msisdnStr.isEmpty() || msisdnStr.length() >0){
-                                iccidAndMsisdn = str + "_" + msisdnStr;
-                            }else{
+                            if (!msisdnStr.isEmpty() && !str.isEmpty()){
+                                iccidAndMsisdn = msisdnStr + "_" + str;
+                            }else if(msisdnStr.isEmpty()){
                                 iccidAndMsisdn = str;
+                            } else if (str.isEmpty()) {
+                                iccidAndMsisdn = msisdnStr;
                             }
 
                             System.out.println("calling deadCardSendButton");

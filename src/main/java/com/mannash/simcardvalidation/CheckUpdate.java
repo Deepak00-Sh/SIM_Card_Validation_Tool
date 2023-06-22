@@ -1,16 +1,17 @@
 package com.mannash.simcardvalidation;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Properties;
 
 import java.net.Authenticator;
@@ -412,24 +413,24 @@ public class CheckUpdate {
 
     }
 
-    public void showUpdateAlert() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Update Available");
-        ButtonType downloadButton = new ButtonType("Download");
-        ButtonType noThanks = new ButtonType("No, thanks", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.setContentText("A new version of the app is available.\n" +
-                "Do you want to download and install it now?");
-        alert.setHeaderText(null);
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
-        alert.getButtonTypes().clear();
-        alert.getButtonTypes().setAll(downloadButton, noThanks);
-        alert.showAndWait().ifPresent(button -> {
-            if (button == downloadButton) {
-                downloadJarFile();
-            }
-        });
-    }
+//    public void showUpdateAlert() {
+//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//        alert.setTitle("Update Available");
+//        ButtonType downloadButton = new ButtonType("Download");
+//        ButtonType noThanks = new ButtonType("No, thanks", ButtonBar.ButtonData.CANCEL_CLOSE);
+//        alert.setContentText("A new version of the app is available.\n" +
+//                "Do you want to download and install it now?");
+//        alert.setHeaderText(null);
+//        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+//        stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+//        alert.getButtonTypes().clear();
+//        alert.getButtonTypes().setAll(downloadButton, noThanks);
+//        alert.showAndWait().ifPresent(button -> {
+//            if (button == downloadButton) {
+//                downloadJarFile();
+//            }
+//        });
+//    }
 
     public void downloadOnStart(){
         try {
@@ -452,23 +453,6 @@ public class CheckUpdate {
             InputStream inputStream = connection.getInputStream();
             Files.copy(inputStream, updateFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-
-
-//            Files.copy(url.openStream(), updateFilePath, StandardCopyOption.REPLACE_EXISTING);
-            // show download complete message and close the application
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//            alert.setTitle("Download Complete");
-//            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-//            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
-//            alert.setHeaderText("The update has been downloaded.");
-//            alert.setContentText("Please restart the application to apply the update.");
-//            alert.showAndWait();
-//
-//            //updating new version in config
-////            updateNewVersionInConfig("1.1");
-//            //closing application
-//            System.exit(0);
-
         } catch (SocketTimeoutException e) {
             System.out.println("Request timed out");
         } catch (IOException e) {
@@ -483,6 +467,77 @@ public class CheckUpdate {
         }
     }
 
+//    public void downloadJarFile() {
+//        try {
+//            // create updates directory if it doesn't exist
+//            Path updateDir = Paths.get("..\\updates");
+//            if (!Files.exists(updateDir)) {
+//                Files.createDirectories(updateDir);
+//            }
+//            // download JAR file to updates directory
+//            Path updateFilePath = Paths.get(LOCAL_JAR_DOWNLOAD_PATH);
+//            URL url = new URL(JAR_FILE_URL);
+//
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//            connection.setRequestMethod("GET");
+//
+//            connection.setConnectTimeout(timeout);
+//            connection.setReadTimeout(timeout);
+//
+//            connection.connect();
+//            InputStream inputStream = connection.getInputStream();
+//            Files.copy(inputStream, updateFilePath, StandardCopyOption.REPLACE_EXISTING);
+//
+//
+////            Files.copy(url.openStream(), updateFilePath, StandardCopyOption.REPLACE_EXISTING);
+////            // show download complete message and close the application
+////            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+////            alert.setTitle("Download Complete");
+////            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+////            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+////            alert.setHeaderText("The update has been downloaded.");
+////            alert.setContentText("Please restart the application to apply the update.");
+////            alert.showAndWait();
+//
+//            //updating new version in config
+////            updateNewVersionInConfig("1.1");
+//            //closing application
+////            System.exit(0);
+//
+//        } catch (SocketTimeoutException e) {
+//            System.out.println("Request timed out");
+//            updateErrorAlert();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            updateErrorAlert();
+//        }
+//    }
+
+
+
+
+
+    public void updateErrorAlert(){
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Download Failed");
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+            alert.setHeaderText("Failed to download the update.");
+            alert.setContentText("Please try again later.");
+            alert.getButtonTypes().clear();
+            ButtonType okButton = new ButtonType("OK");
+            alert.getButtonTypes().add(okButton);
+            alert.showAndWait().ifPresent(button -> {
+                if (button == okButton) {
+                    alert.close();
+                }
+            });
+        });
+    }
+
+
     public void downloadJarFile() {
         try {
             // create updates directory if it doesn't exist
@@ -490,6 +545,7 @@ public class CheckUpdate {
             if (!Files.exists(updateDir)) {
                 Files.createDirectories(updateDir);
             }
+
             // download JAR file to updates directory
             Path updateFilePath = Paths.get(LOCAL_JAR_DOWNLOAD_PATH);
             URL url = new URL(JAR_FILE_URL);
@@ -501,54 +557,125 @@ public class CheckUpdate {
             connection.setReadTimeout(timeout);
 
             connection.connect();
-            InputStream inputStream = connection.getInputStream();
-            Files.copy(inputStream, updateFilePath, StandardCopyOption.REPLACE_EXISTING);
+            long contentLength = connection.getContentLengthLong();
 
+            InputStream inputStream = connection.getInputStream();
+
+            // Create a custom dialog for the progress
+            Dialog<Void> progressDialog = new Dialog<>();
+            progressDialog.setTitle("Downloading Update");
+            progressDialog.setWidth(300);
+            Stage progressDialogStage = (Stage) progressDialog.getDialogPane().getScene().getWindow();
+            progressDialogStage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
+            progressDialog.setHeaderText("Downloading the update...");
+
+            // Create a VBox to hold the progress indicator
+            VBox vbox = new VBox();
+            ProgressBar progressIndicator = new ProgressBar();
+            progressIndicator.setPrefWidth(300);
+            vbox.getChildren().add(progressIndicator);
+            progressDialog.getDialogPane().setContent(vbox);
+
+            // Create a Task for downloading the file
+            Task<Void> downloadTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    FileOutputStream fileOutputStream = new FileOutputStream(updateFilePath.toFile());
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    long totalBytesRead = 0;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        fileOutputStream.write(buffer, 0, bytesRead);
+                        totalBytesRead += bytesRead;
+
+                        // Update the progress
+                        double progress = (double) totalBytesRead / contentLength;
+                        Platform.runLater(() -> progressIndicator.setProgress(progress));
+                    }
+
+                    fileOutputStream.close();
+                    inputStream.close();
+
+                    return null;
+                }
+            };
+
+            // Set up completion behavior for the Task
+            downloadTask.setOnSucceeded(event -> {
+                progressDialogStage.close();
+
+                updateDownloadedAlert();
+
+            });
+
+
+
+            downloadTask.setOnFailed(event -> {
+                progressDialogStage.close();
+                // Show the error alert
+                updateErrorAlert();
+            });
+
+
+
+            // Set the task on the progress dialog
+            progressDialog.setResultConverter(dialogButton -> {
+                if (dialogButton == ButtonType.CANCEL) {
+                    downloadTask.cancel();
+                }
+                return null;
+            });
+            progressDialog.setOnCloseRequest(event -> downloadTask.cancel());
+            progressDialog.setOnShown(event -> new Thread(downloadTask).start());
+            progressDialog.showAndWait();
+
+
+
+        } catch (SocketTimeoutException e) {
+            System.out.println("Request timed out");
+            updateErrorAlert();
+        } catch (IOException e) {
+            e.printStackTrace();
+            updateErrorAlert();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            updateErrorAlert();
+        }
+    }
+
+
+
+    public void updateDownloadedAlert(){
+        Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Download Complete");
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
             alert.setHeaderText("The update has been downloaded.");
             alert.setContentText("Please restart the application to apply the update.");
-            alert.showAndWait();
+            alert.getButtonTypes().clear();
+            ButtonType restartButton = new ButtonType("Restart");
+            alert.getButtonTypes().add(restartButton);
+            alert.showAndWait().ifPresent(button -> {
+                if (button == restartButton) {
+                    System.exit(0);
+                }
+            });
+        });
+//        System.exit(0);
 
-            System.exit(0);
+
+    }
 
 
-//            Files.copy(url.openStream(), updateFilePath, StandardCopyOption.REPLACE_EXISTING);
-//            // show download complete message and close the application
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//            alert.setTitle("Download Complete");
-//            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-//            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
-//            alert.setHeaderText("The update has been downloaded.");
-//            alert.setContentText("Please restart the application to apply the update.");
-//            alert.showAndWait();
-
-            //updating new version in config
-//            updateNewVersionInConfig("1.1");
-            //closing application
-//            System.exit(0);
-
-        } catch (SocketTimeoutException e) {
-            System.out.println("Request timed out");
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Download Failed");
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
-            alert.setHeaderText("Failed to download the update.");
-            alert.setContentText("Please try again later.");
-            alert.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Download Failed");
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image("/com/mannash/javafxapplication/fxml/images/airtelair2.png"));
-            alert.setHeaderText("Failed to download the update.");
-            alert.setContentText("Please try again later.");
-            alert.showAndWait();
+    public boolean isJarDownloaded(){
+        File jar = new File(LOCAL_JAR_DOWNLOAD_PATH);
+        if(jar.exists()){
+            return true;
+        }else{
+            return false;
         }
     }
 
