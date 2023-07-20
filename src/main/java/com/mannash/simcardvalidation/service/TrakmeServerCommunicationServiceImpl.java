@@ -46,9 +46,9 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 	File proxyFile ;
 	Properties properties = new Properties();
 	FileInputStream input = null;
-//	String filePath = "..\\config\\";
+	String filePath = "..\\config\\";
 
-	String filePath = "D:\\Work\\R&D\\SIMVerify\\config\\";
+//	String filePath = "D:\\Work\\R&D\\SIMVerify\\config\\";
 
 	String proxyUser = null;
 	String proxyPassword = null;
