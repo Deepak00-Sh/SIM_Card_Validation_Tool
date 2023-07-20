@@ -1,6 +1,7 @@
 package com.mannash.simcardvalidation;
 
 import com.google.gson.Gson;
+import com.mannash.simcardvalidation.common.UpdateRequestType;
 import com.mannash.simcardvalidation.pojo.*;
 import com.mannash.simcardvalidation.service.TrakmeServerCommunicationService;
 import com.mannash.simcardvalidation.service.TrakmeServerCommunicationServiceImpl;
@@ -18,10 +19,24 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.util.Base64;
 
 public class LoginFormController {
     @FXML
@@ -39,6 +54,13 @@ public class LoginFormController {
     String userId = null;
     UserInfo userInfo;
     public static String loggedInUserName;
+
+    String libFolder = "..\\lib\\";
+    String licenseFile = libFolder + "License.lic";
+    String licenseKey = "simVerifyMannash@#2023";
+    static final String ENCRYPTION_ALGORITHM = "AES";
+    private static final int ITERATION_COUNT = 65536; // Adjust this as needed
+    private static final int KEY_LENGTH = 256;
 
     @FXML
     private void onLoginPress() throws IOException {
@@ -80,6 +102,8 @@ public class LoginFormController {
 
             loadTestingWindowData();
 
+            updateVersionOnServerAndFlagInLocalFile(userId);
+
             startTransferDataThread(LoginFormController.loggedInUserName);
 
             try {
@@ -91,6 +115,105 @@ public class LoginFormController {
 
         }
 
+    }
+
+    private void updateVersionOnServerAndFlagInLocalFile(String userId) {
+        TrakmeServerCommunicationServiceImpl trakmeServerCommunicationService = new TrakmeServerCommunicationServiceImpl();
+        CheckUpdate checkUpdate = new CheckUpdate();
+        ResponseUserDataInfos responseUserDataInfos = trakmeServerCommunicationService.getUserByEmail(userId);
+        if (responseUserDataInfos != null){
+            int id = responseUserDataInfos.getId();
+            int flag = responseUserDataInfos.getResponseUserDataPojo().getUsrDataFlag();
+            String localVersion = checkUpdate.getCurrentVersion();
+            int versionUpdateStatusCode = trakmeServerCommunicationService.updateUserData(userId, id, UpdateRequestType.VERSION.toString(),1, localVersion);
+            if (versionUpdateStatusCode == 200){
+                System.out.println("Version updated successfully on server. Status code : "+versionUpdateStatusCode);
+            }else {
+                System.out.println("Version could not be updated on server. Status code : "+versionUpdateStatusCode);
+            }
+            System.out.println("FLAG : "+flag);
+            if (flag != 0 && flag != 1){
+                updateLocalFlag(1, userId);
+            }else {
+                updateLocalFlag(flag, userId);
+            }
+        }
+    }
+
+    private void updateLocalFlag(int usrDataFlag, String userId) {
+        File lib = new File(libFolder);
+        if (!lib.exists()){
+            lib.mkdir();
+        }
+
+        File license = new File(licenseFile);
+        if (!license.exists()){
+            try {
+                license.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        String data = userId + "_" + usrDataFlag;
+        try {
+            encryptAndUpdateData(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void encryptAndUpdateData(String data){
+        try {
+            SecretKey secretKey = generateSecretKey();
+            Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+
+            // Update the encrypted data in the file
+            Path file = Paths.get(licenseFile);
+            Files.write(file, Base64.getEncoder().encode(encryptedBytes), StandardOpenOption.TRUNCATE_EXISTING);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public String readAndDecryptData() {
+        try {
+            SecretKey secretKey = generateSecretKey();
+            // Read the encrypted data from the file
+            byte[] encryptedBytes = Files.readAllBytes(Paths.get(licenseFile));
+
+            Cipher cipher = Cipher.getInstance(ENCRYPTION_ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedBytes));
+            return new String(decryptedBytes);
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    private SecretKey generateSecretKey() {
+        SecretKeyFactory factory = null;
+        try {
+            try {
+                factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        KeySpec spec = new PBEKeySpec(licenseKey.toCharArray(), "salt".getBytes(StandardCharsets.UTF_8), ITERATION_COUNT, KEY_LENGTH);
+        SecretKey tmp = null;
+        try {
+            tmp = factory.generateSecret(spec);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+        return new SecretKeySpec(tmp.getEncoded(), ENCRYPTION_ALGORITHM);
     }
 
     private void loadTestingWindowData() {
@@ -142,6 +265,10 @@ public class LoginFormController {
         if (serverResponse == null) {
             System.out.println("server response is null");
         }
+
+        System.out.println(" response 1 : "+serverResponse);
+        System.out.println(" response 2 : "+serverResponse2);
+        System.out.println(" response 3 : "+serverResponse3);
 
         if (serverResponse != null && serverResponse2 != null && serverResponse3 != null) {
             File config = new File("..\\config\\testingConfig.conf");

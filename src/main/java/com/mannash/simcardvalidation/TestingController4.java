@@ -5,6 +5,7 @@ import com.mannash.simcardvalidation.card.ProfileTest3G;
 import com.mannash.simcardvalidation.card.StressTest;
 import com.mannash.simcardvalidation.pojo.ExportTestingResultPojo;
 import com.mannash.simcardvalidation.pojo.RequestSimVerificationCardPojos;
+import com.mannash.simcardvalidation.pojo.ResponseUserDataInfos;
 import com.mannash.simcardvalidation.pojo.TerminalInfo;
 import com.mannash.simcardvalidation.service.*;
 import javafx.application.Platform;
@@ -278,6 +279,13 @@ public class TestingController4 extends LoginFormController implements Initializ
                 updateAvailableAlert();
             }
 
+            return;
+        }
+
+        int flag = getFlag();
+
+        if (flag == 0){
+            licenseExpired();
             return;
         }
 
@@ -668,6 +676,36 @@ public class TestingController4 extends LoginFormController implements Initializ
 //        }
 
 
+    }
+
+    private int getFlag() {
+        TrakmeServerCommunicationServiceImpl service = new TrakmeServerCommunicationServiceImpl();
+        ResponseUserDataInfos responseUserDataInfos = service.getUserByEmail(LoginFormController.loggedInUserName);
+        int flag = 1;
+        if ( responseUserDataInfos != null){
+            flag = responseUserDataInfos.getResponseUserDataPojo().getUsrDataFlag();
+        }else {
+            LoginFormController loginFormController = new LoginFormController();
+            String decryptedData = loginFormController.readAndDecryptData();
+            System.out.println("Reading flag from local file");
+
+            if (decryptedData != null) {
+                try {
+                    flag = Integer.parseInt(String.valueOf(decryptedData.charAt(decryptedData.length() - 1)));
+                    System.out.println("Flag : "+flag);
+                }catch (Exception e){
+                    flag = 1;
+                }
+            }else {
+                flag = 1;
+            }
+        }
+
+        if (flag != 0 && flag != 1){
+            return 1;
+        }else {
+            return flag ;
+        }
     }
 
 //    private boolean isJarDownloaded() {

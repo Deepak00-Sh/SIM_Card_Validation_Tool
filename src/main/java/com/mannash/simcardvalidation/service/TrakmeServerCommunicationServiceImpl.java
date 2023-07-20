@@ -3,7 +3,7 @@ package com.mannash.simcardvalidation.service;
 import com.google.gson.Gson;
 import com.mannash.simcardvalidation.ProxyAuthenticator;
 import com.mannash.simcardvalidation.pojo.*;
-import org.apache.commons.codec.binary.Base64;
+//import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -22,8 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 //import com.mannash.trakme.client.pojo.LogType;
 //import com.mannash.trakme.client.pojo.RequestClientLogPojo;
 //import com.mannash.trakme.client.pojo.ResponseAuthenticationPojo;
@@ -47,7 +46,9 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 	File proxyFile ;
 	Properties properties = new Properties();
 	FileInputStream input = null;
-	String filePath = "..\\config\\";
+//	String filePath = "..\\config\\";
+
+	String filePath = "D:\\Work\\R&D\\SIMVerify\\config\\";
 
 	String proxyUser = null;
 	String proxyPassword = null;
@@ -104,7 +105,7 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 			System.setProperty("http.proxyPassword", this.proxyPassword);
 			System.setProperty("http.agent", this.userAgent);
 
-			String encodedUserPwd = new String(Base64.encodeBase64((proxyUser + ":" + proxyPassword).getBytes()));
+//			String encodedUserPwd = new String(Base64.encodeBase64((proxyUser + ":" + proxyPassword).getBytes()));
 			Authenticator.setDefault(new ProxyAuthenticator(proxyUser, proxyPassword));
 		}
 
@@ -1117,6 +1118,151 @@ public class TrakmeServerCommunicationServiceImpl implements TrakmeServerCommuni
 			return false;
 		}
 
+
+	}
+
+	public ResponseUserDataInfos getUserByEmail(String userName){
+
+		ResponseUserDataInfos responseUserDataInfos = new ResponseUserDataInfos();
+
+		String USERNAME = "hitesh.khanna@airtel.com";
+		String PASSWORD = "hihite49";
+		String encodedHeader = Base64.getEncoder()
+				.encodeToString((USERNAME + ":" + PASSWORD).getBytes(StandardCharsets.UTF_8));
+
+		System.out.println(encodedHeader);
+
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpURLConnection connection = null;
+
+		try {
+			String completeUrl = "http://103.228.113.86:32100/svr/api/external/user/getByEmail?usrEmail=" + userName;
+
+			URL url = new URL(completeUrl);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Basic " + encodedHeader);
+			connection.setConnectTimeout(timeout);
+			connection.setReadTimeout(timeout);
+
+			connection.connect();
+			int statusCode = connection.getResponseCode();
+			System.out.println("Status : " + statusCode);
+
+			if (statusCode == HttpURLConnection.HTTP_OK) {
+				InputStream inputStream = connection.getInputStream();
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+				String responseString = bufferedReader.readLine();
+				Gson gson = new Gson();
+				responseUserDataInfos = gson.fromJson(responseString, ResponseUserDataInfos.class);
+				bufferedReader.close();
+				inputStream.close();
+			}
+
+			connection.disconnect();
+			return responseUserDataInfos;
+
+		} catch (SocketTimeoutException e) {
+			System.out.println("Request timed out");
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		finally {
+			try {
+				client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+
+	public int updateUserData(String userName, int id, String requestType, int flag, String version){
+
+		ResponseUserDataInfos responseUserDataInfos = new ResponseUserDataInfos();
+
+		String USERNAME = "hitesh.khanna@airtel.com";
+		String PASSWORD = "hihite49";
+		String encodedHeader = Base64.getEncoder()
+				.encodeToString((USERNAME + ":" + PASSWORD).getBytes(StandardCharsets.UTF_8));
+
+		System.out.println(encodedHeader);
+
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpURLConnection connection = null;
+
+		try {
+			String completeUrl = "http://103.228.113.86:32100/svr/api/external/user/updateUserData";
+
+			URL url = new URL(completeUrl);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("PUT");
+			connection.setRequestProperty("Authorization", "Basic " + encodedHeader);
+
+//			connection.setRequestProperty("id", String.valueOf(id));
+//			connection.setRequestProperty("updateRequestType",requestType);
+//			connection.setRequestProperty("usrDataFlag", String.valueOf(flag));
+//			connection.setRequestProperty("usrDataVersion",version);
+//			connection.setRequestProperty("usrEmail",userName);
+
+			connection.setDoOutput(true);
+
+			// Construct the request body as a Map
+			Map<String, Object> requestBodyMap = new HashMap<>();
+			requestBodyMap.put("id", id);
+			requestBodyMap.put("updateRequestType", requestType);
+			requestBodyMap.put("usrDataFlag", flag);
+			requestBodyMap.put("usrDataVersion", version);
+			requestBodyMap.put("usrEmail", userName);
+
+			// Convert the Map to a JSON string
+			String requestBody = new Gson().toJson(requestBodyMap);
+
+			connection.setRequestProperty("Content-Type", "application/json");
+
+			try (OutputStream outputStream = connection.getOutputStream()) {
+				byte[] requestBodyBytes = requestBody.getBytes(StandardCharsets.UTF_8);
+				outputStream.write(requestBodyBytes, 0, requestBodyBytes.length);
+			}
+
+			connection.setConnectTimeout(timeout);
+			connection.setReadTimeout(timeout);
+
+			connection.connect();
+			int statusCode = connection.getResponseCode();
+			System.out.println("Status : " + statusCode);
+
+//			if (statusCode == HttpURLConnection.HTTP_OK) {
+//				InputStream inputStream = connection.getInputStream();
+//				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+//				String responseString = bufferedReader.readLine();
+//				Gson gson = new Gson();
+//				responseUserDataInfos = gson.fromJson(responseString, ResponseUserDataInfos.class);
+//				bufferedReader.close();
+//				inputStream.close();
+//			}
+
+			connection.disconnect();
+//			return responseUserDataInfos;
+			return statusCode;
+
+		} catch (SocketTimeoutException e) {
+			System.out.println("Request timed out");
+			return 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+		finally {
+			try {
+				client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 
